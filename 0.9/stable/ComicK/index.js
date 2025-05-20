@@ -1851,17 +1851,17 @@ var source = (() => {
       "use strict";
       init_buffer();
       Object.defineProperty(exports, "__esModule", { value: true });
-      exports.LabelRow = LabelRow2;
+      exports.LabelRow = LabelRow;
       exports.InputRow = InputRow2;
       exports.StepperRow = StepperRow;
       exports.ToggleRow = ToggleRow2;
-      exports.SelectRow = SelectRow;
+      exports.SelectRow = SelectRow2;
       exports.ButtonRow = ButtonRow2;
       exports.WebViewRow = WebViewRow;
       exports.NavigationRow = NavigationRow2;
       exports.OAuthButtonRow = OAuthButtonRow;
       exports.DeferredItem = DeferredItem;
-      function LabelRow2(id, props) {
+      function LabelRow(id, props) {
         return { ...props, id, type: "labelRow", isHidden: props.isHidden ?? false };
       }
       function InputRow2(id, props) {
@@ -1878,7 +1878,7 @@ var source = (() => {
       function ToggleRow2(id, props) {
         return { ...props, id, type: "toggleRow", isHidden: props.isHidden ?? false };
       }
-      function SelectRow(id, props) {
+      function SelectRow2(id, props) {
         return { ...props, id, type: "selectRow", isHidden: props.isHidden ?? false };
       }
       function ButtonRow2(id, props) {
@@ -2688,7 +2688,7 @@ var source = (() => {
       "use strict";
       init_buffer();
       Object.defineProperty(exports, "__esModule", { value: true });
-      exports.createFormState = createFormState;
+      exports.createFormState = createFormState2;
       var FormState = class {
         form;
         _value;
@@ -2727,7 +2727,7 @@ var source = (() => {
           this.form.reloadForm();
         }
       };
-      function createFormState(form, initialValue) {
+      function createFormState2(form, initialValue) {
         const state = new FormState(form, initialValue);
         return [() => state.value, state.updateValue.bind(state), state.selector];
       }
@@ -2813,14 +2813,14 @@ var source = (() => {
       init_buffer();
       Object.defineProperty(exports, "__esModule", { value: true });
       exports.DiscoverSectionType = void 0;
-      var DiscoverSectionType2;
-      (function(DiscoverSectionType3) {
-        DiscoverSectionType3[DiscoverSectionType3["featured"] = 0] = "featured";
-        DiscoverSectionType3[DiscoverSectionType3["simpleCarousel"] = 1] = "simpleCarousel";
-        DiscoverSectionType3[DiscoverSectionType3["prominentCarousel"] = 2] = "prominentCarousel";
-        DiscoverSectionType3[DiscoverSectionType3["chapterUpdates"] = 3] = "chapterUpdates";
-        DiscoverSectionType3[DiscoverSectionType3["genres"] = 4] = "genres";
-      })(DiscoverSectionType2 || (exports.DiscoverSectionType = DiscoverSectionType2 = {}));
+      var DiscoverSectionType3;
+      (function(DiscoverSectionType4) {
+        DiscoverSectionType4[DiscoverSectionType4["featured"] = 0] = "featured";
+        DiscoverSectionType4[DiscoverSectionType4["simpleCarousel"] = 1] = "simpleCarousel";
+        DiscoverSectionType4[DiscoverSectionType4["prominentCarousel"] = 2] = "prominentCarousel";
+        DiscoverSectionType4[DiscoverSectionType4["chapterUpdates"] = 3] = "chapterUpdates";
+        DiscoverSectionType4[DiscoverSectionType4["genres"] = 4] = "genres";
+      })(DiscoverSectionType3 || (exports.DiscoverSectionType = DiscoverSectionType3 = {}));
     }
   });
 
@@ -3050,592 +3050,1060 @@ var source = (() => {
     }
   });
 
-  // src/ContentTemplate/main.ts
+  // src/ComicK/main.ts
   var main_exports = {};
   __export(main_exports, {
-    ContentTemplate: () => ContentTemplate,
-    ContentTemplateExtension: () => ContentTemplateExtension
+    ComicK: () => ComicK,
+    ComicKExtension: () => ComicKExtension
   });
+  init_buffer();
+  var import_types3 = __toESM(require_lib(), 1);
+
+  // src/utils/url-builder/array-query-variant.ts
+  init_buffer();
+
+  // src/utils/url-builder/base.ts
+  init_buffer();
+  var URLBuilder = class {
+    baseUrl;
+    queryParams = {};
+    pathSegments = [];
+    constructor(baseUrl) {
+      this.baseUrl = baseUrl.replace(/\/+$/, "");
+    }
+    formatArrayQuery(key, value) {
+      return value.length > 0 ? value.map((v) => `${key}[]=${v}`) : [];
+    }
+    formatObjectQuery(key, value) {
+      return Object.entries(value).map(
+        ([objKey, objValue]) => objValue !== void 0 ? `${key}[${objKey}]=${objValue}` : void 0
+      ).filter((x) => x !== void 0);
+    }
+    formatQuery(queryParams) {
+      return Object.entries(queryParams).flatMap(([key, value]) => {
+        if (Array.isArray(value)) {
+          return this.formatArrayQuery(key, value);
+        }
+        if (typeof value === "object") {
+          return this.formatObjectQuery(key, value);
+        }
+        return value === "" ? [] : [`${key}=${value}`];
+      }).join("&");
+    }
+    build() {
+      const fullPath = this.pathSegments.length > 0 ? `/${this.pathSegments.join("/")}` : "";
+      const queryString = this.formatQuery(this.queryParams);
+      if (queryString.length > 0)
+        return `${this.baseUrl}${fullPath}?${queryString}`;
+      return `${this.baseUrl}${fullPath}`;
+    }
+    addPath(segment) {
+      this.pathSegments.push(segment.replace(/^\/+|\/+$/g, ""));
+      return this;
+    }
+    addQuery(key, value) {
+      this.queryParams[key] = value;
+      return this;
+    }
+    reset() {
+      this.queryParams = {};
+      this.pathSegments = [];
+      return this;
+    }
+  };
+
+  // src/utils/url-builder/array-query-variant.ts
+  var URLBuilder2 = class extends URLBuilder {
+    formatArrayQuery(key, value) {
+      return value.length > 0 ? value.map((v) => `${key}=${v}`) : [];
+    }
+  };
+
+  // src/ComicK/ComicKParser.ts
+  init_buffer();
+  var import_types = __toESM(require_lib(), 1);
+
+  // src/ComicK/utils/language.ts
+  init_buffer();
+  var languages = [
+    { code: "all", name: "All Languages" },
+    { code: "en", name: "English" },
+    { code: "pt-br", name: "Portugu\xEAs do Brasil" },
+    { code: "es-419", name: "Espa\xF1ol (Latinoam\xE9rica)" },
+    { code: "ru", name: "\u0420\u0443\u0441\u0441\u043A\u0438\u0439" },
+    { code: "fr", name: "Fran\xE7ais" },
+    { code: "pl", name: "Polski" },
+    { code: "vi", name: "Ti\u1EBFng Vi\u1EC7t" },
+    { code: "tr", name: "T\xFCrk\xE7e" },
+    { code: "id", name: "Bahasa Indonesia" },
+    { code: "it", name: "Italiano" },
+    { code: "es", name: "Espa\xF1ol" },
+    { code: "ar", name: "\u0627\u0644\u0639\u0631\u0628\u064A\u0629" },
+    { code: "zh-hk", name: "\u7E41\u9AD4\u4E2D\u6587 (\u9999\u6E2F)" },
+    { code: "uk", name: "\u0423\u043A\u0440\u0430\u0457\u043D\u0441\u044C\u043A\u0430" },
+    { code: "hu", name: "Magyar" },
+    { code: "de", name: "Deutsch" },
+    { code: "zh", name: "\u4E2D\u6587" },
+    { code: "ko", name: "\uD55C\uAD6D\uC5B4" },
+    { code: "th", name: "\u0E44\u0E17\u0E22" },
+    { code: "bg", name: "\u0411\u044A\u043B\u0433\u0430\u0440\u0441\u043A\u0438" },
+    { code: "ca", name: "Catal\xE0" },
+    { code: "fa", name: "\u0641\u0627\u0631\u0633\u06CC" },
+    { code: "ro", name: "Rom\xE2n\u0103" },
+    { code: "cs", name: "\u010Ce\u0161tina" },
+    { code: "mn", name: "\u041C\u043E\u043D\u0433\u043E\u043B" },
+    { code: "pt", name: "Portugu\xEAs" },
+    { code: "he", name: "\u05E2\u05D1\u05E8\u05D9\u05EA" },
+    { code: "hi", name: "\u0939\u093F\u0928\u094D\u0926\u0940" },
+    { code: "tl", name: "Tagalog" },
+    { code: "ms", name: "Bahasa Melayu" },
+    { code: "eu", name: "Euskara" },
+    { code: "kk", name: "\u049A\u0430\u0437\u0430\u049B" },
+    { code: "sr", name: "\u0421\u0440\u043F\u0441\u043A\u0438" },
+    { code: "my", name: "\u1019\u103C\u1014\u103A\u1019\u102C\u1005\u102C" },
+    { code: "el", name: "\u0395\u03BB\u03BB\u03B7\u03BD\u03B9\u03BA\u03AC" },
+    { code: "nl", name: "Nederlands" },
+    { code: "ja", name: "\u65E5\u672C\u8A9E" },
+    { code: "eo", name: "Esperanto" },
+    { code: "fi", name: "Suomi" },
+    { code: "ka", name: "\u10E5\u10D0\u10E0\u10D7\u10E3\u10DA\u10D8" },
+    { code: "lt", name: "Lietuvi\u0173" },
+    { code: "ta", name: "\u0BA4\u0BAE\u0BBF\u0BB4\u0BCD" },
+    { code: "bn", name: "\u09AC\u09BE\u0982\u09B2\u09BE" },
+    { code: "sv", name: "Svenska" },
+    { code: "hr", name: "Hrvatski" },
+    { code: "la", name: "Latina" },
+    { code: "ne", name: "\u0928\u0947\u092A\u093E\u0932\u0940" },
+    { code: "cv", name: "\u0427\u04D1\u0432\u0430\u0448" },
+    { code: "ur", name: "\u0627\u0631\u062F\u0648" },
+    { code: "be", name: "\u0411\u0435\u043B\u0430\u0440\u0443\u0441\u043A\u0430\u044F" },
+    { code: "no", name: "Norsk" },
+    { code: "sq", name: "Shqip" },
+    { code: "te", name: "\u0C24\u0C46\u0C32\u0C41\u0C17\u0C41" },
+    { code: "da", name: "Dansk" },
+    { code: "et", name: "Eesti" },
+    { code: "ga", name: "Gaeilge" },
+    { code: "az", name: "Az\u0259rbaycan" },
+    { code: "sk", name: "Sloven\u010Dina" },
+    { code: "jv", name: "Basa Jawa" },
+    { code: "af", name: "Afrikaans" },
+    { code: "sl", name: "Sloven\u0161\u010Dina" },
+    { code: "uz", name: "\u040E\u0437\u0431\u0435\u043A" }
+  ];
+  function getLanguageOptions() {
+    return languages.map((lang) => ({
+      id: lang.code,
+      title: lang.name
+    }));
+  }
+  function getLanguageName(code) {
+    return languages.find((language) => language.code == code)?.name ?? "Unknown";
+  }
+
+  // src/ComicK/ComicKParser.ts
+  var parseMangaDetails = (data, mangaId, apiUrl) => {
+    const { comic, authors, artists } = data;
+    const titles = [
+      comic.title,
+      ...comic.md_titles.map((titleObj) => titleObj.title)
+    ];
+    const tagSections = [];
+    const countryTitle = parseComicType(comic.country);
+    if (countryTitle) {
+      tagSections.push(
+        ...parseTags(
+          [{ slug: comic.country, name: countryTitle }],
+          "type",
+          "Type"
+        )
+      );
+    }
+    tagSections.push(
+      ...parseTags(
+        comic.md_comic_md_genres.map((item) => item.md_genres),
+        "genres",
+        "Genres"
+      )
+    );
+    const mangaInfo = {
+      thumbnailUrl: comic.cover_url,
+      synopsis: comic.desc ? Application.decodeHTMLEntities(comic.desc) : "",
+      primaryTitle: titles[0],
+      secondaryTitles: titles,
+      contentRating: parseContentRating(comic.content_rating),
+      status: parseComicStatus(comic.status),
+      author: authors.map((author) => author.name).join(","),
+      artist: artists.map((artists2) => artists2.name).join(","),
+      tagGroups: tagSections,
+      shareUrl: new URLBuilder2(apiUrl).addPath("comic").addPath(mangaId).addQuery("tachiyomi", true).build()
+    };
+    return {
+      mangaId,
+      mangaInfo
+    };
+  };
+  function parseChapters(data, sourceManga, filter) {
+    const chaptersData = filterChapters(data.chapters, filter);
+    let sortingIndex = chaptersData.length;
+    return chaptersData.map((chapter) => {
+      const chapNum = Number(chapter.chap);
+      const volume = Number(chapter.vol);
+      const groups = chapter.group_name ?? [];
+      return {
+        chapterId: chapter.hid,
+        sourceManga,
+        title: formatChapterTitle(chapter, filter.showTitle),
+        chapNum: !isNaN(chapNum) ? chapNum : 0,
+        sortingIndex: sortingIndex--,
+        volume: filter.showVol && !isNaN(volume) ? volume : void 0,
+        publishDate: new Date(chapter.created_at),
+        version: groups.join(","),
+        langCode: getLanguageName(chapter.lang)
+      };
+    });
+  }
+  function parseChapterSinceDate(chapters, sinceDate) {
+    if (sinceDate && chapters.length > 0) {
+      const firstChapter = chapters[0];
+      if (firstChapter?.publishDate && firstChapter.publishDate <= sinceDate) {
+        return {
+          hasNewChapters: false,
+          parsedChapters: chapters.filter(
+            (c) => c.publishDate && c.publishDate > sinceDate
+          )
+        };
+      }
+    }
+    return { hasNewChapters: true, parsedChapters: chapters };
+  }
+  var parseChapterDetails = (data, chapter) => ({
+    id: chapter.chapterId,
+    mangaId: chapter.sourceManga.mangaId,
+    pages: data.chapter.images.filter((image) => image.url).map((image) => image.url)
+  });
+  function parseTags(data, sectionId, sectionTitle) {
+    const tags = data.filter((tag) => tag.slug && tag.name).map((tag) => ({
+      id: tag.slug,
+      title: tag.name
+    }));
+    return [
+      {
+        id: sectionId,
+        title: sectionTitle,
+        tags
+      }
+    ];
+  }
+  function parseSearch(data) {
+    return data.filter((comic) => comic.hid).map((comic) => ({
+      imageUrl: comic.cover_url,
+      title: Application.decodeHTMLEntities(comic.title),
+      mangaId: comic.hid,
+      subtitle: Application.decodeHTMLEntities(
+        comic.last_chapter ? `Chapter ${comic.last_chapter}` : comic.title
+      ),
+      contentRating: parseContentRating(comic.content_rating)
+    }));
+  }
+  function parseDiscoverSection(data, type) {
+    return data.filter((comic) => comic.hid).map((comic) => {
+      const baseItem = {
+        imageUrl: comic.cover_url,
+        title: Application.decodeHTMLEntities(comic.title),
+        mangaId: comic.hid,
+        contentRating: parseContentRating(comic.content_rating)
+      };
+      switch (type) {
+        case import_types.DiscoverSectionType.featured:
+          return { ...baseItem, type: "featuredCarouselItem" };
+        case import_types.DiscoverSectionType.prominentCarousel:
+          return { ...baseItem, type: "prominentCarouselItem" };
+        case import_types.DiscoverSectionType.simpleCarousel:
+          return {
+            ...baseItem,
+            subtitle: Application.decodeHTMLEntities(
+              comic.last_chapter ? `Chapter ${comic.last_chapter}` : comic.title
+            ),
+            type: "simpleCarouselItem"
+          };
+        default:
+          throw new Error(`Unknown discover section type: ${type}`);
+      }
+    });
+  }
+  function parseSortFilter() {
+    return [
+      { id: "follow", value: "Most follows" },
+      { id: "view", value: "Most views" },
+      { id: "rating", value: "High rating" },
+      { id: "uploaded", value: "Last updated" }
+    ];
+  }
+  function parseDemographicFilters() {
+    return [
+      { id: "1", value: "Shonen" },
+      { id: "2", value: "Shoujo" },
+      { id: "3", value: "Seinen" },
+      { id: "4", value: "Josei" }
+    ];
+  }
+  function parseTypeFilters() {
+    return [
+      { id: "user", value: "User" },
+      { id: "author", value: "Author" },
+      { id: "group", value: "Group" },
+      { id: "comic", value: "Comic" }
+    ];
+  }
+  function parseCreatedAtFilters() {
+    return [
+      { id: "30", value: "30 days" },
+      { id: "90", value: "3 months" },
+      { id: "180", value: "6 months" },
+      { id: "365", value: "1 year" }
+    ];
+  }
+  function parseComicTypeFilters() {
+    return [
+      { id: "kr", value: "Manhwa" },
+      { id: "jp", value: "Manga" },
+      { id: "cn", value: "Manhua" }
+    ];
+  }
+  function parseContentRating(contentRating) {
+    if (contentRating === "erotica") {
+      return import_types.ContentRating.ADULT;
+    }
+    if (contentRating === "suggestive") {
+      return import_types.ContentRating.MATURE;
+    }
+    return import_types.ContentRating.EVERYONE;
+  }
+  function parseComicType(country) {
+    const comicTypeFilters = parseComicTypeFilters();
+    return comicTypeFilters.find((filter) => filter.id === country)?.value;
+  }
+  function parseComicStatus(status) {
+    const comicStatusMap = {
+      1: "ONGOING",
+      2: "COMPLETED",
+      3: "CANCELLED",
+      4: "ON HIATUS"
+    };
+    return comicStatusMap[status] || "UNKNOWN";
+  }
+  function filterChapters(chapters, filter) {
+    if (filter.hideUnreleasedChapters) {
+      const currentDate = /* @__PURE__ */ new Date();
+      chapters = chapters.filter(
+        (chapter) => new Date(chapter.publish_at) <= currentDate
+      );
+    }
+    if (filter.chapterScoreFiltering) {
+      return filterByScore(chapters);
+    }
+    if (filter.uploadersToggled && filter.uploaders.length) {
+      return filterByUploaders(chapters, filter);
+    }
+    return chapters;
+  }
+  function filterByScore(chapters) {
+    const chapterMap = /* @__PURE__ */ new Map();
+    chapters.forEach((chapter) => {
+      const chapNum = Number(chapter.chap);
+      const score = chapter.up_count - chapter.down_count;
+      const existing = chapterMap.get(chapNum);
+      if (!existing || score > existing.score) {
+        chapterMap.set(chapNum, { score, chapter });
+      }
+    });
+    return Array.from(chapterMap.values()).map((v) => v.chapter);
+  }
+  function filterByUploaders(chapters, filter) {
+    const {
+      uploaders,
+      uploadersWhitelisted,
+      aggressiveUploadersFilter,
+      strictNameMatching
+    } = filter;
+    return chapters.filter((chapter) => {
+      const groups = chapter.group_name ?? [];
+      const matchesUploader = (group, uploader) => strictNameMatching ? uploader === group : group.toLowerCase().includes(uploader.toLowerCase());
+      const hasMatchingUploader = groups.some(
+        (group) => uploaders.some((uploader) => matchesUploader(group, uploader))
+      );
+      const hasAllUploaders = groups.every(
+        (group) => uploaders.some((uploader) => matchesUploader(group, uploader))
+      );
+      if (aggressiveUploadersFilter) {
+        return uploadersWhitelisted ? hasAllUploaders : !hasMatchingUploader;
+      }
+      return uploadersWhitelisted ? hasMatchingUploader : !hasAllUploaders;
+    });
+  }
+  function formatChapterTitle(chapter, showTitle) {
+    return showTitle && chapter.title ? `${chapter.title}` : "";
+  }
+
+  // src/ComicK/ComicKSettings.ts
   init_buffer();
   var import_types2 = __toESM(require_lib(), 1);
 
-  // src/ContentTemplate/content.json
-  var content_default = [
-    {
-      titleId: "1",
-      primaryTitle: "\u307E\u3060\u307E\u3060\u9060\u3044",
-      secondaryTitles: ["Still a long way to go"],
-      url: "https://x.com/Dsymobile4999/status/1848129570622275753",
-      thumbnailUrl: "https://pbs.twimg.com/media/GaXR8OhaoAAubuJ?format=jpg&name=large",
-      synopsis: "Source: https://x.com/Dsymobile4999/status/1848129570622275753",
-      contentRating: "EVERYONE",
-      status: "Finished",
-      author: "\u305F\u3073\u306F\u3071\u306E\u3089\u307E",
-      rating: 1,
-      genres: ["Art"],
-      tags: ["Anime/Manga Style", "Colored", "AI"],
-      chapters: [
-        {
-          chapterId: "1",
-          languageCode: "JP",
-          chapterNumber: 1,
-          volumeNumber: 1,
-          pages: [
-            "https://pbs.twimg.com/media/GaXR8OhaoAAubuJ?format=jpg&name=large"
-          ]
-        }
-      ]
-    },
-    {
-      titleId: "2",
-      primaryTitle: "\u660E\u65E5\u304C\u4E0D\u5B89",
-      secondaryTitles: ["I'm worried about tomorrow"],
-      url: "https://x.com/Dsymobile4999/status/1847963474426728804",
-      thumbnailUrl: "https://pbs.twimg.com/media/GaSMt0hakAAqdeQ?format=jpg&name=large",
-      synopsis: "Source: https://x.com/Dsymobile4999/status/1847963474426728804",
-      contentRating: "EVERYONE",
-      status: "Finished",
-      author: "\u305F\u3073\u306F\u3071\u306E\u3089\u307E",
-      rating: 1,
-      genres: ["Art"],
-      tags: ["Anime/Manga Style", "Colored", "AI"],
-      chapters: [
-        {
-          chapterId: "1",
-          languageCode: "JP",
-          chapterNumber: 1,
-          volumeNumber: 1,
-          pages: [
-            "https://pbs.twimg.com/media/GaSMt0hakAAqdeQ?format=jpg&name=large"
-          ]
-        }
-      ]
-    },
-    {
-      titleId: "3",
-      primaryTitle: "\u4E18\u306E\u4E0A\u306B\u5BC4\u308A\u9053",
-      url: "https://x.com/Dsymobile4999/status/1847903076671508757",
-      secondaryTitles: ["Detour to the top of the hill"],
-      thumbnailUrl: "https://pbs.twimg.com/media/GaSMk7LbUAAG8sF?format=jpg&name=large",
-      synopsis: "Source: https://x.com/Dsymobile4999/status/1847903076671508757",
-      contentRating: "EVERYONE",
-      status: "Finished",
-      author: "\u305F\u3073\u306F\u3071\u306E\u3089\u307E",
-      rating: 1,
-      genres: ["Art"],
-      tags: ["Anime/Manga Style", "Colored", "AI"],
-      chapters: [
-        {
-          chapterId: "1",
-          languageCode: "JP",
-          chapterNumber: 1,
-          volumeNumber: 1,
-          pages: [
-            "https://pbs.twimg.com/media/GaSMk7LbUAAG8sF?format=jpg&name=large"
-          ]
-        }
-      ]
-    },
-    {
-      titleId: "4",
-      primaryTitle: "\u6797\u6A8E\u306E\u5B63\u7BC0",
-      secondaryTitles: ["Apple Season"],
-      url: "https://x.com/Dsymobile4999/status/1847827578427445464",
-      thumbnailUrl: "https://pbs.twimg.com/media/GaSONzVbUAEohKw?format=jpg&name=large",
-      synopsis: "Source: https://x.com/Dsymobile4999/status/1847827578427445464",
-      contentRating: "EVERYONE",
-      status: "Finished",
-      author: "\u305F\u3073\u306F\u3071\u306E\u3089\u307E",
-      rating: 1,
-      genres: ["Art"],
-      tags: ["Anime/Manga Style", "Colored", "AI"],
-      chapters: [
-        {
-          chapterId: "1",
-          languageCode: "JP",
-          chapterNumber: 1,
-          volumeNumber: 1,
-          pages: [
-            "https://pbs.twimg.com/media/GaSONzVbUAEohKw?format=jpg&name=large"
-          ]
-        }
-      ]
-    },
-    {
-      titleId: "5",
-      primaryTitle: "\u4ECA\u65E5\u306F\u6D1E\u7A9F\u63A2\u691C\u3060",
-      secondaryTitles: ["Today we're exploring caves"],
-      url: "https://x.com/Dsymobile4999/status/1847767180580180139/photo/1",
-      thumbnailUrl: "https://pbs.twimg.com/media/GaSNaI7bcAAPIIP?format=jpg&name=large",
-      synopsis: "Source: https://x.com/Dsymobile4999/status/1847767180580180139/photo/1",
-      contentRating: "EVERYONE",
-      status: "Finished",
-      author: "\u305F\u3073\u306F\u3071\u306E\u3089\u307E",
-      rating: 1,
-      genres: ["Art"],
-      tags: ["Anime/Manga Style", "Colored", "AI"],
-      chapters: [
-        {
-          chapterId: "1",
-          languageCode: "JP",
-          chapterNumber: 1,
-          volumeNumber: 1,
-          pages: [
-            "https://pbs.twimg.com/media/GaSNaI7bcAAPIIP?format=jpg&name=large"
-          ]
-        }
-      ]
-    },
-    {
-      titleId: "6",
-      primaryTitle: "\u30A2\u30DD\u30AF\u30EA\u30D5\u30A1",
-      secondaryTitles: ["Apocrypha"],
-      url: "https://x.com/Dsymobile4999/status/1847601088234737836",
-      thumbnailUrl: "https://pbs.twimg.com/media/GaNGkYsbUAEofEf?format=jpg&name=large",
-      synopsis: "Source: https://x.com/Dsymobile4999/status/1847601088234737836",
-      contentRating: "EVERYONE",
-      status: "Finished",
-      author: "\u305F\u3073\u306F\u3071\u306E\u3089\u307E",
-      rating: 1,
-      genres: ["Art"],
-      tags: ["Anime/Manga Style", "Colored", "AI"],
-      chapters: [
-        {
-          chapterId: "1",
-          languageCode: "JP",
-          chapterNumber: 1,
-          volumeNumber: 1,
-          pages: [
-            "https://pbs.twimg.com/media/GaNGkYsbUAEofEf?format=jpg&name=large"
-          ]
-        }
-      ]
-    },
-    {
-      titleId: "7",
-      primaryTitle: "\u5915\u65E5\u306E\u4E2D\u306E\u5E30\u308A\u9053",
-      secondaryTitles: ["On the way home in the sunset"],
-      url: "https://x.com/Dsymobile4999/status/1847540689074004141",
-      thumbnailUrl: "https://pbs.twimg.com/media/GaNHWwfbUAMbUO2?format=jpg&name=large",
-      synopsis: "Source: https://x.com/Dsymobile4999/status/1847540689074004141",
-      contentRating: "EVERYONE",
-      status: "Finished",
-      author: "\u305F\u3073\u306F\u3071\u306E\u3089\u307E",
-      rating: 1,
-      genres: ["Art"],
-      tags: ["Anime/Manga Style", "Colored", "AI"],
-      chapters: [
-        {
-          chapterId: "1",
-          languageCode: "JP",
-          chapterNumber: 1,
-          volumeNumber: 1,
-          pages: [
-            "https://pbs.twimg.com/media/GaNHWwfbUAMbUO2?format=jpg&name=large"
-          ]
-        }
-      ]
-    },
-    {
-      titleId: "8",
-      primaryTitle: "\u6E2F\u8857\u306E\u5348\u5F8C",
-      secondaryTitles: ["Afternoon in the Port City"],
-      url: "https://x.com/Dsymobile4999/status/1847465191837225181/photo/1",
-      thumbnailUrl: "https://pbs.twimg.com/media/GaNHJmFbUAEWKNr?format=jpg&name=large",
-      synopsis: "Source: https://x.com/Dsymobile4999/status/1847465191837225181/photo/1",
-      contentRating: "EVERYONE",
-      status: "Finished",
-      author: "\u305F\u3073\u306F\u3071\u306E\u3089\u307E",
-      rating: 1,
-      genres: ["Art"],
-      tags: ["Anime/Manga Style", "Colored", "AI"],
-      chapters: [
-        {
-          chapterId: "1",
-          languageCode: "JP",
-          chapterNumber: 1,
-          volumeNumber: 1,
-          pages: [
-            "https://pbs.twimg.com/media/GaNHJmFbUAEWKNr?format=jpg&name=large"
-          ]
-        }
-      ]
-    },
-    {
-      titleId: "9",
-      primaryTitle: "\u732B\u3068\u306E\u4F11\u65E5",
-      secondaryTitles: ["Holiday with cats"],
-      url: "https://x.com/Dsymobile4999/status/1847404792550998148",
-      thumbnailUrl: "https://pbs.twimg.com/media/GaNG3tIbsAALJoF?format=jpg&name=large",
-      synopsis: "Source: https://x.com/Dsymobile4999/status/1847404792550998148",
-      contentRating: "EVERYONE",
-      status: "Finished",
-      author: "\u305F\u3073\u306F\u3071\u306E\u3089\u307E",
-      rating: 1,
-      genres: ["Art"],
-      tags: ["Anime/Manga Style", "Colored", "AI"],
-      chapters: [
-        {
-          chapterId: "1",
-          languageCode: "JP",
-          chapterNumber: 1,
-          volumeNumber: 1,
-          pages: [
-            "https://pbs.twimg.com/media/GaNG3tIbsAALJoF?format=jpg&name=large"
-          ]
-        }
-      ]
-    },
-    {
-      titleId: "10",
-      primaryTitle: "\u591C\u306E\u4E0B\u753A",
-      secondaryTitles: ["Downtown at night"],
-      url: "https://x.com/Dsymobile4999/status/1847238700855710173",
-      thumbnailUrl: "https://pbs.twimg.com/media/GaIG4xSaAAAa681?format=jpg&name=large",
-      synopsis: "Source: https://x.com/Dsymobile4999/status/1847238700855710173",
-      contentRating: "EVERYONE",
-      status: "Finished",
-      author: "\u305F\u3073\u306F\u3071\u306E\u3089\u307E",
-      rating: 1,
-      genres: ["Art"],
-      tags: ["Anime/Manga Style", "Colored", "AI"],
-      chapters: [
-        {
-          chapterId: "1",
-          languageCode: "JP",
-          chapterNumber: 1,
-          volumeNumber: 1,
-          pages: [
-            "https://pbs.twimg.com/media/GaIG4xSaAAAa681?format=jpg&name=large"
-          ]
-        }
-      ]
-    }
-  ];
-
-  // src/ContentTemplate/SettingsForm.ts
+  // src/utils/state.ts
   init_buffer();
-  var import_types = __toESM(require_lib(), 1);
-  var SettingsForm = class extends import_types.Form {
+  function getState(key, defaultValue) {
+    return Application.getState(key) ?? defaultValue;
+  }
+
+  // src/ComicK/ComicKSettings.ts
+  function getLanguages() {
+    return getState("languages", ["all"]);
+  }
+  function getLanguageHomeFilter() {
+    return getState("language_home_filter", false);
+  }
+  function getUploaders() {
+    return getState("uploaders", []);
+  }
+  function getUploadersWhitelisted() {
+    return getState("uploaders_whitelisted", false);
+  }
+  function getSelectedUploaders() {
+    return getState("uploaders_selected", []);
+  }
+  function getUploadersFiltering() {
+    return getState("uploaders_toggled", false);
+  }
+  function getAggresiveUploadersFiltering() {
+    return getState("aggressive_uploaders_filtering", false);
+  }
+  function getStrictNameMatching() {
+    return getState("strict_name_matching", false);
+  }
+  function getShowTitle() {
+    return getState("show_title", false);
+  }
+  function getShowVolumeNumber() {
+    return getState("show_volume_number", false);
+  }
+  function getChapterScoreFiltering() {
+    return getState("chapter_score_filtering", false);
+  }
+  function getHideUnreleasedChapters() {
+    return getState("hide_unreleased_chapters", true);
+  }
+  var ComicKSettingsForm = class extends import_types2.Form {
     getSections() {
       return [
-        (0, import_types.Section)("playground", [
-          (0, import_types.NavigationRow)("playground", {
-            title: "SourceUI Playground",
-            form: new SourceUIPlaygroundForm()
+        (0, import_types2.Section)("languageForm", [
+          (0, import_types2.NavigationRow)("languageFprm", {
+            title: "Language Settings",
+            form: new LanguageForm()
+          })
+        ]),
+        (0, import_types2.Section)("chapterForm", [
+          (0, import_types2.NavigationRow)("chapterForm", {
+            title: "Chapter Settings",
+            form: new ChapterForm()
+          })
+        ]),
+        (0, import_types2.Section)("uploaderForm", [
+          (0, import_types2.NavigationRow)("uploaderForm", {
+            title: "Uploader Settings",
+            form: new UploaderForm()
           })
         ])
       ];
     }
   };
-  var State = class {
-    constructor(form, value) {
-      this.form = form;
-      this._value = value;
-    }
-    _value;
-    get value() {
-      return this._value;
-    }
-    get selector() {
-      return Application.Selector(this, "updateValue");
-    }
-    async updateValue(value) {
-      this._value = value;
-      this.form.reloadForm();
-    }
-  };
-  var SourceUIPlaygroundForm = class extends import_types.Form {
-    inputValue = new State(this, "");
-    rowsVisible = new State(this, false);
-    items = [];
+  var ChapterForm = class extends import_types2.Form {
     getSections() {
+      const hideUnreleasedChapters = getHideUnreleasedChapters();
+      const showVolumeNumber = getShowVolumeNumber();
+      const showTitle = getShowTitle();
       return [
-        (0, import_types.Section)("hideStuff", [
-          (0, import_types.ToggleRow)("toggle", {
-            title: "Toggles can hide rows",
-            value: this.rowsVisible.value,
-            onValueChange: this.rowsVisible.selector
-          })
-        ]),
-        ...(() => this.rowsVisible.value ? [
-          (0, import_types.Section)("hiddenSection", [
-            (0, import_types.InputRow)("input", {
-              title: "Dynamic Input",
-              value: this.inputValue.value,
-              onValueChange: this.inputValue.selector
-            }),
-            (0, import_types.LabelRow)("boundLabel", {
-              title: "Bound label to input",
-              subtitle: "This label updates with the input",
-              value: this.inputValue.value
-            })
-          ]),
-          (0, import_types.Section)("items", [
-            ...this.items.map(
-              (item) => (0, import_types.LabelRow)(item, {
-                title: item
-              })
-            ),
-            (0, import_types.ButtonRow)("addNewItem", {
-              title: "Add New Item",
-              onSelect: Application.Selector(
+        (0, import_types2.Section)(
+          {
+            id: "chapterUnreleased",
+            footer: "Hide chapters that are not yet released."
+          },
+          [
+            (0, import_types2.ToggleRow)("hide_unreleased_chapters", {
+              title: "Hide Unreleased Chapters",
+              value: hideUnreleasedChapters,
+              onValueChange: Application.Selector(
                 this,
-                "addNewItem"
+                "onHideUnreleasedChapters"
               )
             })
-          ])
-        ] : [])()
+          ]
+        ),
+        (0, import_types2.Section)(
+          {
+            id: "chapterContent",
+            footer: "Chapter list formatting."
+          },
+          [
+            (0, import_types2.ToggleRow)("show_volume_number", {
+              title: "Show Chapter Volume",
+              value: showVolumeNumber,
+              onValueChange: Application.Selector(
+                this,
+                "onShowVolumeNumber"
+              )
+            }),
+            (0, import_types2.ToggleRow)("show_title", {
+              title: "Show Chapter Title",
+              value: showTitle,
+              onValueChange: Application.Selector(
+                this,
+                "onShowTitle"
+              )
+            })
+          ]
+        )
       ];
     }
-    async addNewItem() {
-      this.items.push("Item " + (this.items.length + 1));
+    async onHideUnreleasedChapters(value) {
+      Application.setState(value, "hide_unreleased_chapters");
+    }
+    async onShowVolumeNumber(value) {
+      Application.setState(value, "show_volume_number");
+    }
+    async onShowTitle(value) {
+      Application.setState(value, "show_title");
+    }
+  };
+  var LanguageForm = class extends import_types2.Form {
+    getSections() {
+      const language = getLanguages();
+      const languageHomeFilter = getLanguageHomeFilter();
+      return [
+        (0, import_types2.Section)(
+          {
+            id: "languageContent",
+            footer: "When enabled, it will filter New & Hot based on which languages that were chosen."
+          },
+          [
+            (0, import_types2.SelectRow)("languages", {
+              title: "Languages",
+              options: getLanguageOptions(),
+              value: language,
+              minItemCount: 1,
+              maxItemCount: 45,
+              onValueChange: Application.Selector(
+                this,
+                "onSetLanguage"
+              )
+            }),
+            (0, import_types2.ToggleRow)("language_home_filter", {
+              title: "Filter Homepage Language",
+              value: languageHomeFilter,
+              onValueChange: Application.Selector(
+                this,
+                "onLanguageHomeFilter"
+              )
+            })
+          ]
+        )
+      ];
+    }
+    async onSetLanguage(value) {
+      Application.setState(value, "languages");
+    }
+    async onLanguageHomeFilter(value) {
+      Application.setState(value, "language_home_filter");
+    }
+  };
+  var UploaderForm = class extends import_types2.Form {
+    uploaderState = (0, import_types2.createFormState)(this, "");
+    getSections() {
+      const chapterScoreEnabled = getChapterScoreFiltering();
+      const [uploader, , selectorUploader] = this.uploaderState;
+      const chapterScoreFilteringSection = (0, import_types2.Section)(
+        {
+          id: "chapter_score_filtering",
+          footer: chapterScoreEnabled ? "Show only the uploader with the most upvotes for each chapter. Disable to manually manage uploader filtering" : "Show only the uploader with the most upvotes for each chapter."
+        },
+        [
+          (0, import_types2.ToggleRow)("toggle_chapter_score_filtering", {
+            title: "Enable Chapter Score Filtering",
+            value: chapterScoreEnabled,
+            onValueChange: Application.Selector(
+              this,
+              "onChapterScoreFiltering"
+            )
+          })
+        ]
+      );
+      if (chapterScoreEnabled) {
+        return [chapterScoreFilteringSection];
+      }
+      return [
+        chapterScoreFilteringSection,
+        (0, import_types2.Section)("modify_uploaders", [
+          (0, import_types2.SelectRow)("uploaders", {
+            title: "Select Uploaders",
+            value: getSelectedUploaders(),
+            options: getUploaders().map((uploader2) => ({
+              id: uploader2,
+              title: uploader2
+            })),
+            minItemCount: 0,
+            // @ts-expect-error We do not know the max number of uploaders that can be selected
+            maxItemCount: void 0,
+            onValueChange: Application.Selector(
+              this,
+              "onSelectedUploaders"
+            )
+          }),
+          (0, import_types2.InputRow)("uploader", {
+            title: "Uploader Name",
+            value: uploader(),
+            onValueChange: selectorUploader
+          }),
+          (0, import_types2.ButtonRow)("add_uploader", {
+            title: "Add Uploader",
+            onSelect: Application.Selector(
+              this,
+              "onAddUploader"
+            )
+          }),
+          (0, import_types2.ButtonRow)("remove_uploader", {
+            title: "Remove Uploader",
+            onSelect: Application.Selector(
+              this,
+              "onRemoveUploader"
+            )
+          })
+        ]),
+        (0, import_types2.Section)("select_uploaders", [
+          (0, import_types2.ToggleRow)("toggle_uploaders_filtering", {
+            title: "Enable Uploader filtering",
+            value: getUploadersFiltering(),
+            onValueChange: Application.Selector(
+              this,
+              "onUploadersFiltering"
+            )
+          }),
+          (0, import_types2.ToggleRow)("uploaders_switch", {
+            title: "Enable whitelist mode",
+            value: getUploadersWhitelisted(),
+            onValueChange: Application.Selector(
+              this,
+              "onUploadersWhitelisted"
+            )
+          }),
+          (0, import_types2.ToggleRow)("toggle_uploaders_filtering_aggressiveness", {
+            title: "Toggle aggressive filtering",
+            value: getAggresiveUploadersFiltering(),
+            onValueChange: Application.Selector(
+              this,
+              "onAggressiveFiltering"
+            )
+          }),
+          (0, import_types2.ToggleRow)("strict_name_matching", {
+            title: "Strict uploader name matching",
+            value: getStrictNameMatching(),
+            onValueChange: Application.Selector(
+              this,
+              "onStrictNameMatching"
+            )
+          })
+        ])
+      ];
+    }
+    async onAddUploader() {
+      const [uploader, setUploader] = this.uploaderState;
+      const uploaders = getUploaders();
+      if (uploader() in uploaders) {
+        throw new Error(`Uploader ${uploader()} already exists.`);
+      }
+      Application.setState([...uploaders, uploader()], "uploaders");
+      await setUploader("");
+    }
+    async onRemoveUploader() {
+      const [uploader, setUploader] = this.uploaderState;
+      const uploaders = getUploaders();
+      if (!(uploader() in uploaders)) {
+        throw new Error(`Uploader ${uploader()} does not exists.`);
+      }
+      Application.setState(
+        uploaders.filter((i) => i !== uploader()),
+        "uploaders"
+      );
+      await setUploader("");
+    }
+    async onChapterScoreFiltering(value) {
+      Application.setState(value, "chapter_score_filtering");
       this.reloadForm();
+    }
+    async onSelectedUploaders(value) {
+      Application.setState(value, "uploaders_selected");
+    }
+    async onUploadersFiltering(value) {
+      Application.setState(value, "uploaders_toggled");
+    }
+    async onUploadersWhitelisted(value) {
+      Application.setState(value, "uploaders_whitelisted");
+    }
+    async onAggressiveFiltering(value) {
+      Application.setState(value, "aggressive_uploaders_filtering");
+    }
+    async onStrictNameMatching(value) {
+      Application.setState(value, "strict_name_matching");
     }
   };
 
-  // src/ContentTemplate/main.ts
-  var MainInterceptor = class extends import_types2.PaperbackInterceptor {
+  // src/ComicK/main.ts
+  var COMICK_DOMAIN = "https://comick.io";
+  var COMICK_API = "https://api.comick.fun";
+  var LIMIT = 60;
+  var ComicKInterceptor = class extends import_types3.PaperbackInterceptor {
     async interceptRequest(request) {
+      request.headers = {
+        ...request.headers ?? {},
+        ...{
+          referer: COMICK_DOMAIN,
+          "user-agent": await Application.getDefaultUserAgent()
+        }
+      };
       return request;
     }
     async interceptResponse(request, response, data) {
-      void request;
-      void response;
       return data;
     }
   };
-  var ContentTemplateExtension = class {
-    // Implementation of the main rate limiter
-    mainRateLimiter = new import_types2.BasicRateLimiter("main", {
-      numberOfRequests: 15,
-      bufferInterval: 10,
+  var ComicKExtension = class {
+    globalRateLimiter = new import_types3.BasicRateLimiter("rateLimiter", {
+      numberOfRequests: 4,
+      bufferInterval: 1,
       ignoreImages: true
     });
-    // Implementation of the main interceptor
-    mainInterceptor = new MainInterceptor("main");
-    // Method from the Extension interface which we implement, initializes the rate limiter, interceptor, discover sections and search filters
+    mainRequestInterceptor = new ComicKInterceptor("main");
     async initialise() {
-      this.mainRateLimiter.registerInterceptor();
-      this.mainInterceptor.registerInterceptor();
+      this.globalRateLimiter.registerInterceptor();
+      this.mainRequestInterceptor.registerInterceptor();
     }
-    // Implements the settings form, check SettingsForm.ts for more info
     async getSettingsForm() {
-      return new SettingsForm();
+      return new ComicKSettingsForm();
     }
     async getDiscoverSections() {
-      const discover_section_template1 = {
-        id: "discover-section-template1",
-        title: "Discover Section Template 1",
-        subtitle: "This is a template",
-        type: import_types2.DiscoverSectionType.featured
-      };
-      const discover_section_template2 = {
-        id: "discover-section-template2",
-        title: "Discover Section Template 2",
-        subtitle: "This is another template",
-        type: import_types2.DiscoverSectionType.prominentCarousel
-      };
-      const discover_section_template3 = {
-        id: "discover-section-template3",
-        title: "Discover Section Template 3",
-        subtitle: "This is yet another template",
-        type: import_types2.DiscoverSectionType.simpleCarousel
-      };
-      return [
-        discover_section_template1,
-        discover_section_template2,
-        discover_section_template3
-      ];
-    }
-    // Populates both the discover sections
-    async getDiscoverSectionItems(section, metadata) {
-      void metadata;
-      let i = 0;
-      let j = 1;
-      let type;
-      switch (section.id) {
-        case "discover-section-template1":
-          j = 2;
-          type = "featuredCarouselItem";
-          break;
-        case "discover-section-template2":
-          i = content_default.length / 2;
-          j = 2;
-          type = "prominentCarouselItem";
-          break;
-        case "discover-section-template3":
-          type = "simpleCarouselItem";
-          break;
-      }
-      return {
-        items: Array.from(Array(content_default.length / j)).map(() => {
-          const result = {
-            mangaId: content_default[i].titleId,
-            title: content_default[i].primaryTitle ? content_default[i].primaryTitle : "Unknown Title",
-            subtitle: content_default[i].secondaryTitles[0],
-            imageUrl: content_default[i].thumbnailUrl ? content_default[i].thumbnailUrl : "",
-            type
-          };
-          ++i;
-          return result;
-        })
-      };
-    }
-    // Populate search filters
-    async getSearchFilters() {
       return [
         {
-          id: "search-filter-template",
-          type: "dropdown",
-          options: [
-            { id: "include", value: "include" },
-            { id: "exclude", value: "exclude" }
-          ],
-          value: "Exclude",
-          title: "Search Filter Template"
+          id: "most_viewed",
+          title: "Most Viewed",
+          type: import_types3.DiscoverSectionType.prominentCarousel
+        },
+        {
+          id: "most_followed",
+          title: "Most Followed",
+          type: import_types3.DiscoverSectionType.simpleCarousel
+        },
+        {
+          id: "latest_uploads",
+          title: "Latest Uploads",
+          type: import_types3.DiscoverSectionType.simpleCarousel
+        },
+        {
+          id: "genres",
+          title: "Genres",
+          type: import_types3.DiscoverSectionType.genres
         }
       ];
     }
-    // Populates search
-    async getSearchResults(query, metadata) {
-      void metadata;
-      const results = { items: [] };
-      for (let i = 0; i < content_default.length; i++) {
-        if (content_default[i].primaryTitle.toLowerCase().indexOf(query.title.toLowerCase()) != -1 && query.filters[0].value == "include" || content_default[i].primaryTitle.toLowerCase().indexOf(query.title.toLowerCase()) == -1 && query.filters[0].value == "exclude") {
-          if (content_default[i].titleId) {
-            const result = {
-              mangaId: content_default[i].titleId,
-              title: content_default[i].primaryTitle ? content_default[i].primaryTitle : "Unknown Title",
-              subtitle: content_default[i].secondaryTitles[0],
-              imageUrl: content_default[i].thumbnailUrl ? content_default[i].thumbnailUrl : ""
-            };
-            results.items.push(result);
-          }
-        } else {
-          for (let j = 0; j < content_default[i].secondaryTitles.length; j++) {
-            if (content_default[i].secondaryTitles[j].toLowerCase().indexOf(query.title.toLowerCase()) != -1 && query.filters[0].value == "include" || content_default[i].secondaryTitles[j].toLowerCase().indexOf(query.title.toLowerCase()) == -1 && query.filters[0].value == "exclude") {
-              if (content_default[i].titleId) {
-                const result = {
-                  mangaId: content_default[i].titleId,
-                  title: content_default[i].primaryTitle ? content_default[i].primaryTitle : "Unknown Title",
-                  subtitle: content_default[i].secondaryTitles[0],
-                  imageUrl: content_default[i].thumbnailUrl ? content_default[i].thumbnailUrl : ""
-                };
-                results.items.push(result);
-              }
-              break;
-            }
-          }
-        }
+    async getDiscoverSectionItems(section, metadata) {
+      switch (section.id) {
+        case "most_viewed":
+          return this.getDiscoverSectionItemsWrapper(
+            section,
+            metadata,
+            "view",
+            20
+          );
+        case "most_followed":
+          return this.getDiscoverSectionItemsWrapper(
+            section,
+            metadata,
+            "follow",
+            20
+          );
+        case "latest_uploads":
+          return this.getDiscoverSectionItemsWrapper(
+            section,
+            metadata,
+            "uploaded",
+            20
+          );
+        case "genres":
+          return this.getDiscoverSectionGenres();
+        default:
+          return this.getDiscoverSectionItemsWrapper(
+            section,
+            metadata,
+            "",
+            20
+          );
       }
-      return results;
     }
-    // Populates the title details
     async getMangaDetails(mangaId) {
-      for (let i = 0; i < content_default.length; i++) {
-        if (mangaId == content_default[i].titleId) {
-          let contentRating;
-          switch (content_default[i].contentRating) {
-            case "ADULT":
-              contentRating = import_types2.ContentRating.ADULT;
-              break;
-            case "MATURE":
-              contentRating = import_types2.ContentRating.MATURE;
-              break;
-            default:
-              contentRating = import_types2.ContentRating.EVERYONE;
-              break;
-          }
-          const genres = {
-            id: "genres",
-            title: "Genres",
-            tags: []
-          };
-          for (let j = 0; j < content_default[i].genres.length; j++) {
-            const genre = {
-              id: content_default[i].genres[j].toLowerCase().replace(" ", "-"),
-              title: content_default[i].genres[j]
-            };
-            genres.tags.push(genre);
-          }
-          const tags = {
-            id: "tags",
-            title: "Tags",
-            tags: []
-          };
-          for (let j = 0; j < content_default[i].tags.length; j++) {
-            const tag = {
-              id: content_default[i].tags[j].toLowerCase().replace(" ", "-"),
-              title: content_default[i].tags[j]
-            };
-            tags.tags.push(tag);
-          }
-          return {
-            mangaId,
-            mangaInfo: {
-              thumbnailUrl: content_default[i].thumbnailUrl ? content_default[i].thumbnailUrl : "",
-              synopsis: content_default[i].synopsis ? content_default[i].synopsis : "No synopsis.",
-              primaryTitle: content_default[i].primaryTitle ? content_default[i].primaryTitle : "Unknown Title",
-              secondaryTitles: content_default[i].secondaryTitles ? content_default[i].secondaryTitles : [],
-              contentRating,
-              status: content_default[i].status,
-              author: content_default[i].author,
-              rating: content_default[i].rating,
-              tagGroups: [genres, tags],
-              artworkUrls: [content_default[i].thumbnailUrl],
-              shareUrl: content_default[i].url
-            }
-          };
-        }
-      }
-      throw new Error("No title with this id exists");
+      const request = {
+        url: new URLBuilder2(COMICK_API).addPath("comic").addPath(mangaId).addQuery("tachiyomi", "true").build(),
+        method: "GET"
+      };
+      const parsedData = await this.fetchApi(request);
+      return parseMangaDetails(parsedData, mangaId, COMICK_API);
     }
-    // Populates the chapter list
     async getChapters(sourceManga, sinceDate) {
-      void sinceDate;
-      for (let i = 0; i < content_default.length; i++) {
-        if (sourceManga.mangaId == content_default[i].titleId) {
-          const chapters = [];
-          for (let j = 0; j < content_default[i].chapters.length; j++) {
-            if (content_default[i].chapters[j].chapterId) {
-              const chapter = {
-                chapterId: content_default[i].chapters[j].chapterId,
-                sourceManga,
-                langCode: content_default[i].chapters[j].languageCode ? content_default[i].chapters[j].languageCode : "EN",
-                chapNum: content_default[i].chapters[j].chapterNumber ? content_default[i].chapters[j].chapterNumber : j + 1,
-                title: content_default[i].primaryTitle,
-                volume: content_default[i].chapters[j].volumeNumber
-              };
-              chapters.push(chapter);
-            }
+      const chapterFilter = this.getChapterFilter();
+      const chapters = [];
+      let limit = 1e5;
+      if (sinceDate) {
+        limit = LIMIT;
+      }
+      let page = 1;
+      let data = await this.createChapterRequest(
+        sourceManga.mangaId,
+        page++,
+        limit
+      );
+      const { hasNewChapters, parsedChapters } = parseChapterSinceDate(
+        parseChapters(data, sourceManga, chapterFilter),
+        sinceDate
+      );
+      parsedChapters.forEach((chapter) => chapters.push(chapter));
+      if (hasNewChapters) {
+        while (data.chapters.length === limit) {
+          data = await this.createChapterRequest(
+            sourceManga.mangaId,
+            page++,
+            limit
+          );
+          const { hasNewChapters: hasNewChapters2, parsedChapters: parsedChapters2 } = parseChapterSinceDate(
+            parseChapters(data, sourceManga, chapterFilter),
+            sinceDate
+          );
+          parsedChapters2.forEach((chapter) => chapters.push(chapter));
+          if (!hasNewChapters2) {
+            break;
           }
-          return chapters;
         }
       }
-      throw new Error("No title with this id exists");
+      return chapters;
     }
-    // Populates a chapter with images
-    async getChapterDetails(chapter) {
-      for (let i = 0; i < content_default.length; i++) {
-        if (chapter.sourceManga.mangaId == content_default[i].titleId) {
-          for (let j = 0; j < content_default[i].chapters.length; j++) {
-            if (chapter.chapterId == content_default[i].chapters[j].chapterId) {
-              const chapterDetails = {
-                id: chapter.chapterId,
-                mangaId: chapter.sourceManga.mangaId,
-                pages: content_default[i].chapters[j].pages
-              };
-              return chapterDetails;
-            }
-          }
-          throw new Error("No chapter with this id exists");
-        }
+    async createChapterRequest(mangaId, page, limit = 1e5) {
+      const builder = new URLBuilder2(COMICK_API).addPath("comic").addPath(mangaId).addPath("chapters").addQuery("page", page.toString()).addQuery("limit", limit.toString()).addQuery("tachiyomi", "true");
+      const languages2 = getLanguages();
+      if (languages2[0] != "all") {
+        builder.addQuery("lang", languages2.join(","));
       }
-      throw new Error("No title with this id exists");
+      const request = {
+        url: builder.build(),
+        method: "GET"
+      };
+      const parsedData = await this.fetchApi(request);
+      return parsedData;
+    }
+    async getChapterDetails(chapter) {
+      const request = {
+        url: new URLBuilder2(COMICK_API).addPath("chapter").addPath(chapter.chapterId).addQuery("tachiyomi", "true").build(),
+        method: "GET"
+      };
+      const parsedData = await this.fetchApi(request);
+      return parseChapterDetails(parsedData, chapter);
+    }
+    async getSearchFilters() {
+      const filters = [];
+      const sortFilters = parseSortFilter();
+      filters.push({
+        id: "sort",
+        type: "dropdown",
+        options: sortFilters,
+        value: "",
+        title: "Sort"
+      });
+      const demographicFilters = parseDemographicFilters();
+      filters.push({
+        type: "multiselect",
+        options: demographicFilters,
+        id: "demographic",
+        allowExclusion: false,
+        title: "Demographic",
+        value: {},
+        allowEmptySelection: true,
+        maximum: demographicFilters.length
+      });
+      const typeFilters = parseTypeFilters();
+      filters.push({
+        id: "type",
+        type: "dropdown",
+        options: typeFilters,
+        value: "",
+        title: "Type"
+      });
+      const createdAtFilters = parseCreatedAtFilters();
+      filters.push({
+        id: "created-at",
+        type: "dropdown",
+        options: createdAtFilters,
+        value: "",
+        title: "Created At"
+      });
+      const comicTypeFilters = parseComicTypeFilters();
+      filters.push({
+        type: "multiselect",
+        options: comicTypeFilters,
+        id: "comic-type",
+        allowExclusion: false,
+        title: "Comic Type",
+        value: {},
+        allowEmptySelection: true,
+        maximum: comicTypeFilters.length
+      });
+      const genres = await this.getGenres();
+      const searchTagSections = parseTags(genres, "genres", "Genres");
+      for (const tagSection of searchTagSections) {
+        filters.push({
+          type: "multiselect",
+          options: tagSection.tags.map((x) => ({
+            id: x.id,
+            value: x.title
+          })),
+          id: tagSection.id,
+          allowExclusion: true,
+          title: tagSection.title,
+          value: {},
+          allowEmptySelection: false,
+          maximum: void 0
+        });
+      }
+      return filters;
+    }
+    async getSearchResults(query, metadata) {
+      if (metadata?.completed) return import_types3.EndOfPageResults;
+      const page = metadata?.page ?? 1;
+      const builder = new URLBuilder2(COMICK_API).addPath("v1.0").addPath("search").addQuery("page", page).addQuery("limit", LIMIT).addQuery("tachiyomi", "true");
+      const getFilterValue = (id) => query.filters.find((filter) => filter.id == id)?.value;
+      const genres = getFilterValue("genres");
+      if (genres && typeof genres === "object") {
+        const excludes = [];
+        const includes = [];
+        for (const tag of Object.entries(genres)) {
+          switch (tag[1]) {
+            case "excluded":
+              excludes.push(tag[0]);
+              break;
+            case "included":
+              includes.push(tag[0]);
+              break;
+          }
+        }
+        builder.addQuery("excludes", excludes);
+        builder.addQuery("genres", includes);
+      }
+      const sort = getFilterValue("sort");
+      if (sort && typeof sort === "string") {
+        builder.addQuery("sort", sort);
+      }
+      const createdAt = getFilterValue("created-at");
+      if (createdAt && typeof createdAt === "string") {
+        builder.addQuery("time", createdAt);
+      }
+      const mangaType = getFilterValue("type");
+      if (mangaType && typeof mangaType === "string") {
+        builder.addQuery("type", mangaType);
+      }
+      const demographic = getFilterValue("demographic");
+      if (demographic && typeof demographic === "object") {
+        builder.addQuery("demographic", Object.keys(demographic));
+      }
+      const comicType = getFilterValue("comic-type");
+      if (comicType && typeof comicType === "object") {
+        builder.addQuery("country", Object.keys(comicType));
+      }
+      builder.addQuery("q", query.title.replace(/ /g, "%20"));
+      const request = {
+        url: builder.build(),
+        method: "GET"
+      };
+      const parsedData = await this.fetchApi(request);
+      const manga = parseSearch(parsedData);
+      metadata = parsedData.length === LIMIT ? { page: page + 1, completed: false } : { completed: true };
+      const pagedResults = {
+        items: manga,
+        metadata
+      };
+      return pagedResults;
+    }
+    async getGenres() {
+      const request = {
+        url: new URLBuilder2(COMICK_API).addPath("genre").addQuery("tachiyomi", "true").build(),
+        method: "GET"
+      };
+      return await this.fetchApi(request);
+    }
+    async getDiscoverSectionGenres() {
+      const genres = await this.getGenres();
+      return {
+        items: genres.map((genre) => ({
+          type: "genresCarouselItem",
+          searchQuery: {
+            title: "",
+            filters: [
+              { id: "genres", value: { [genre.slug]: "included" } }
+            ]
+          },
+          name: genre.name,
+          metadata: void 0
+        })),
+        metadata: void 0
+      };
+    }
+    async getDiscoverSectionItemsWrapper(section, metadata, sort, limit) {
+      if (sort.length == 0) {
+        return {
+          items: [],
+          metadata: void 0
+        };
+      }
+      if (metadata?.completed) return import_types3.EndOfPageResults;
+      const page = metadata?.page ?? 1;
+      const request = {
+        url: new URLBuilder2(COMICK_API).addPath("v1.0").addPath("search").addQuery("sort", sort).addQuery("limit", limit).addQuery("page", page).addQuery("tachiyomi", "true").build(),
+        method: "GET"
+      };
+      const parsedData = await this.fetchApi(request);
+      const manga = parseDiscoverSection(parsedData, section.type);
+      metadata = parsedData.length === limit ? { page: page + 1, completed: false } : { completed: true };
+      const pagedResults = {
+        items: manga,
+        metadata
+      };
+      return pagedResults;
+    }
+    getChapterFilter() {
+      return {
+        showTitle: getShowTitle(),
+        showVol: getShowVolumeNumber(),
+        chapterScoreFiltering: getChapterScoreFiltering(),
+        uploadersToggled: getUploadersFiltering(),
+        uploadersWhitelisted: getUploadersWhitelisted(),
+        aggressiveUploadersFilter: getAggresiveUploadersFiltering(),
+        strictNameMatching: getStrictNameMatching(),
+        uploaders: getUploaders(),
+        hideUnreleasedChapters: getHideUnreleasedChapters()
+      };
+    }
+    async fetchApi(request) {
+      try {
+        const [, data] = await Application.scheduleRequest(request);
+        return JSON.parse(Application.arrayBufferToUTF8String(data));
+      } catch {
+        throw new Error(`Failed to fetch data from ${request.url}`);
+      }
     }
   };
-  var ContentTemplate = new ContentTemplateExtension();
+  var ComicK = new ComicKExtension();
   return __toCommonJS(main_exports);
 })();
 /*! Bundled license information:
