@@ -46,11 +46,11 @@ var source = (() => {
       var revLookup = [];
       var Arr = typeof Uint8Array !== "undefined" ? Uint8Array : Array;
       var code = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-      for (i2 = 0, len = code.length; i2 < len; ++i2) {
-        lookup[i2] = code[i2];
-        revLookup[code.charCodeAt(i2)] = i2;
+      for (i = 0, len = code.length; i < len; ++i) {
+        lookup[i] = code[i];
+        revLookup[code.charCodeAt(i)] = i;
       }
-      var i2;
+      var i;
       var len;
       revLookup["-".charCodeAt(0)] = 62;
       revLookup["_".charCodeAt(0)] = 63;
@@ -81,19 +81,19 @@ var source = (() => {
         var arr = new Arr(_byteLength(b64, validLen, placeHoldersLen));
         var curByte = 0;
         var len2 = placeHoldersLen > 0 ? validLen - 4 : validLen;
-        var i3;
-        for (i3 = 0; i3 < len2; i3 += 4) {
-          tmp = revLookup[b64.charCodeAt(i3)] << 18 | revLookup[b64.charCodeAt(i3 + 1)] << 12 | revLookup[b64.charCodeAt(i3 + 2)] << 6 | revLookup[b64.charCodeAt(i3 + 3)];
+        var i2;
+        for (i2 = 0; i2 < len2; i2 += 4) {
+          tmp = revLookup[b64.charCodeAt(i2)] << 18 | revLookup[b64.charCodeAt(i2 + 1)] << 12 | revLookup[b64.charCodeAt(i2 + 2)] << 6 | revLookup[b64.charCodeAt(i2 + 3)];
           arr[curByte++] = tmp >> 16 & 255;
           arr[curByte++] = tmp >> 8 & 255;
           arr[curByte++] = tmp & 255;
         }
         if (placeHoldersLen === 2) {
-          tmp = revLookup[b64.charCodeAt(i3)] << 2 | revLookup[b64.charCodeAt(i3 + 1)] >> 4;
+          tmp = revLookup[b64.charCodeAt(i2)] << 2 | revLookup[b64.charCodeAt(i2 + 1)] >> 4;
           arr[curByte++] = tmp & 255;
         }
         if (placeHoldersLen === 1) {
-          tmp = revLookup[b64.charCodeAt(i3)] << 10 | revLookup[b64.charCodeAt(i3 + 1)] << 4 | revLookup[b64.charCodeAt(i3 + 2)] >> 2;
+          tmp = revLookup[b64.charCodeAt(i2)] << 10 | revLookup[b64.charCodeAt(i2 + 1)] << 4 | revLookup[b64.charCodeAt(i2 + 2)] >> 2;
           arr[curByte++] = tmp >> 8 & 255;
           arr[curByte++] = tmp & 255;
         }
@@ -105,8 +105,8 @@ var source = (() => {
       function encodeChunk(uint8, start, end2) {
         var tmp;
         var output = [];
-        for (var i3 = start; i3 < end2; i3 += 3) {
-          tmp = (uint8[i3] << 16 & 16711680) + (uint8[i3 + 1] << 8 & 65280) + (uint8[i3 + 2] & 255);
+        for (var i2 = start; i2 < end2; i2 += 3) {
+          tmp = (uint8[i2] << 16 & 16711680) + (uint8[i2 + 1] << 8 & 65280) + (uint8[i2 + 2] & 255);
           output.push(tripletToBase64(tmp));
         }
         return output.join("");
@@ -117,8 +117,8 @@ var source = (() => {
         var extraBytes = len2 % 3;
         var parts = [];
         var maxChunkLength = 16383;
-        for (var i3 = 0, len22 = len2 - extraBytes; i3 < len22; i3 += maxChunkLength) {
-          parts.push(encodeChunk(uint8, i3, i3 + maxChunkLength > len22 ? len22 : i3 + maxChunkLength));
+        for (var i2 = 0, len22 = len2 - extraBytes; i2 < len22; i2 += maxChunkLength) {
+          parts.push(encodeChunk(uint8, i2, i2 + maxChunkLength > len22 ? len22 : i2 + maxChunkLength));
         }
         if (extraBytes === 1) {
           tmp = uint8[len2 - 1];
@@ -146,19 +146,19 @@ var source = (() => {
         var eMax = (1 << eLen) - 1;
         var eBias = eMax >> 1;
         var nBits = -7;
-        var i2 = isLE ? nBytes - 1 : 0;
+        var i = isLE ? nBytes - 1 : 0;
         var d = isLE ? -1 : 1;
-        var s = buffer[offset + i2];
-        i2 += d;
+        var s = buffer[offset + i];
+        i += d;
         e = s & (1 << -nBits) - 1;
         s >>= -nBits;
         nBits += eLen;
-        for (; nBits > 0; e = e * 256 + buffer[offset + i2], i2 += d, nBits -= 8) {
+        for (; nBits > 0; e = e * 256 + buffer[offset + i], i += d, nBits -= 8) {
         }
         m = e & (1 << -nBits) - 1;
         e >>= -nBits;
         nBits += mLen;
-        for (; nBits > 0; m = m * 256 + buffer[offset + i2], i2 += d, nBits -= 8) {
+        for (; nBits > 0; m = m * 256 + buffer[offset + i], i += d, nBits -= 8) {
         }
         if (e === 0) {
           e = 1 - eBias;
@@ -176,7 +176,7 @@ var source = (() => {
         var eMax = (1 << eLen) - 1;
         var eBias = eMax >> 1;
         var rt = mLen === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0;
-        var i2 = isLE ? 0 : nBytes - 1;
+        var i = isLE ? 0 : nBytes - 1;
         var d = isLE ? 1 : -1;
         var s = value < 0 || value === 0 && 1 / value < 0 ? 1 : 0;
         value = Math.abs(value);
@@ -209,13 +209,13 @@ var source = (() => {
             e = 0;
           }
         }
-        for (; mLen >= 8; buffer[offset + i2] = m & 255, i2 += d, m /= 256, mLen -= 8) {
+        for (; mLen >= 8; buffer[offset + i] = m & 255, i += d, m /= 256, mLen -= 8) {
         }
         e = e << mLen | m;
         eLen += mLen;
-        for (; eLen > 0; buffer[offset + i2] = e & 255, i2 += d, e /= 256, eLen -= 8) {
+        for (; eLen > 0; buffer[offset + i] = e & 255, i += d, e /= 256, eLen -= 8) {
         }
-        buffer[offset + i2 - d] |= s * 128;
+        buffer[offset + i - d] |= s * 128;
       };
     }
   });
@@ -375,8 +375,8 @@ var source = (() => {
       function fromArrayLike(array) {
         const length = array.length < 0 ? 0 : checked(array.length) | 0;
         const buf = createBuffer(length);
-        for (let i2 = 0; i2 < length; i2 += 1) {
-          buf[i2] = array[i2] & 255;
+        for (let i = 0; i < length; i += 1) {
+          buf[i] = array[i] & 255;
         }
         return buf;
       }
@@ -451,10 +451,10 @@ var source = (() => {
         if (a === b) return 0;
         let x = a.length;
         let y = b.length;
-        for (let i2 = 0, len = Math.min(x, y); i2 < len; ++i2) {
-          if (a[i2] !== b[i2]) {
-            x = a[i2];
-            y = b[i2];
+        for (let i = 0, len = Math.min(x, y); i < len; ++i) {
+          if (a[i] !== b[i]) {
+            x = a[i];
+            y = b[i];
             break;
           }
         }
@@ -487,17 +487,17 @@ var source = (() => {
         if (list.length === 0) {
           return Buffer3.alloc(0);
         }
-        let i2;
+        let i;
         if (length === void 0) {
           length = 0;
-          for (i2 = 0; i2 < list.length; ++i2) {
-            length += list[i2].length;
+          for (i = 0; i < list.length; ++i) {
+            length += list[i].length;
           }
         }
         const buffer = Buffer3.allocUnsafe(length);
         let pos = 0;
-        for (i2 = 0; i2 < list.length; ++i2) {
-          let buf = list[i2];
+        for (i = 0; i < list.length; ++i) {
+          let buf = list[i];
           if (isInstance(buf, Uint8Array)) {
             if (pos + buf.length > buffer.length) {
               if (!Buffer3.isBuffer(buf)) buf = Buffer3.from(buf);
@@ -610,17 +610,17 @@ var source = (() => {
       }
       Buffer3.prototype._isBuffer = true;
       function swap(b, n, m) {
-        const i2 = b[n];
+        const i = b[n];
         b[n] = b[m];
-        b[m] = i2;
+        b[m] = i;
       }
       Buffer3.prototype.swap16 = function swap16() {
         const len = this.length;
         if (len % 2 !== 0) {
           throw new RangeError("Buffer size must be a multiple of 16-bits");
         }
-        for (let i2 = 0; i2 < len; i2 += 2) {
-          swap(this, i2, i2 + 1);
+        for (let i = 0; i < len; i += 2) {
+          swap(this, i, i + 1);
         }
         return this;
       };
@@ -629,9 +629,9 @@ var source = (() => {
         if (len % 4 !== 0) {
           throw new RangeError("Buffer size must be a multiple of 32-bits");
         }
-        for (let i2 = 0; i2 < len; i2 += 4) {
-          swap(this, i2, i2 + 3);
-          swap(this, i2 + 1, i2 + 2);
+        for (let i = 0; i < len; i += 4) {
+          swap(this, i, i + 3);
+          swap(this, i + 1, i + 2);
         }
         return this;
       };
@@ -640,11 +640,11 @@ var source = (() => {
         if (len % 8 !== 0) {
           throw new RangeError("Buffer size must be a multiple of 64-bits");
         }
-        for (let i2 = 0; i2 < len; i2 += 8) {
-          swap(this, i2, i2 + 7);
-          swap(this, i2 + 1, i2 + 6);
-          swap(this, i2 + 2, i2 + 5);
-          swap(this, i2 + 3, i2 + 4);
+        for (let i = 0; i < len; i += 8) {
+          swap(this, i, i + 7);
+          swap(this, i + 1, i + 6);
+          swap(this, i + 2, i + 5);
+          swap(this, i + 3, i + 4);
         }
         return this;
       };
@@ -713,10 +713,10 @@ var source = (() => {
         const len = Math.min(x, y);
         const thisCopy = this.slice(thisStart, thisEnd);
         const targetCopy = target.slice(start, end2);
-        for (let i2 = 0; i2 < len; ++i2) {
-          if (thisCopy[i2] !== targetCopy[i2]) {
-            x = thisCopy[i2];
-            y = targetCopy[i2];
+        for (let i = 0; i < len; ++i) {
+          if (thisCopy[i] !== targetCopy[i]) {
+            x = thisCopy[i];
+            y = targetCopy[i];
             break;
           }
         }
@@ -783,36 +783,36 @@ var source = (() => {
             byteOffset /= 2;
           }
         }
-        function read(buf, i3) {
+        function read(buf, i2) {
           if (indexSize === 1) {
-            return buf[i3];
+            return buf[i2];
           } else {
-            return buf.readUInt16BE(i3 * indexSize);
+            return buf.readUInt16BE(i2 * indexSize);
           }
         }
-        let i2;
+        let i;
         if (dir) {
           let foundIndex = -1;
-          for (i2 = byteOffset; i2 < arrLength; i2++) {
-            if (read(arr, i2) === read(val2, foundIndex === -1 ? 0 : i2 - foundIndex)) {
-              if (foundIndex === -1) foundIndex = i2;
-              if (i2 - foundIndex + 1 === valLength) return foundIndex * indexSize;
+          for (i = byteOffset; i < arrLength; i++) {
+            if (read(arr, i) === read(val2, foundIndex === -1 ? 0 : i - foundIndex)) {
+              if (foundIndex === -1) foundIndex = i;
+              if (i - foundIndex + 1 === valLength) return foundIndex * indexSize;
             } else {
-              if (foundIndex !== -1) i2 -= i2 - foundIndex;
+              if (foundIndex !== -1) i -= i - foundIndex;
               foundIndex = -1;
             }
           }
         } else {
           if (byteOffset + valLength > arrLength) byteOffset = arrLength - valLength;
-          for (i2 = byteOffset; i2 >= 0; i2--) {
+          for (i = byteOffset; i >= 0; i--) {
             let found = true;
             for (let j = 0; j < valLength; j++) {
-              if (read(arr, i2 + j) !== read(val2, j)) {
+              if (read(arr, i + j) !== read(val2, j)) {
                 found = false;
                 break;
               }
             }
-            if (found) return i2;
+            if (found) return i;
           }
         }
         return -1;
@@ -841,13 +841,13 @@ var source = (() => {
         if (length > strLen / 2) {
           length = strLen / 2;
         }
-        let i2;
-        for (i2 = 0; i2 < length; ++i2) {
-          const parsed = parseInt(string.substr(i2 * 2, 2), 16);
-          if (numberIsNaN(parsed)) return i2;
-          buf[offset + i2] = parsed;
+        let i;
+        for (i = 0; i < length; ++i) {
+          const parsed = parseInt(string.substr(i * 2, 2), 16);
+          if (numberIsNaN(parsed)) return i;
+          buf[offset + i] = parsed;
         }
-        return i2;
+        return i;
       }
       function utf8Write(buf, string, offset, length) {
         return blitBuffer(utf8ToBytes(string, buf.length - offset), buf, offset, length);
@@ -932,12 +932,12 @@ var source = (() => {
       function utf8Slice(buf, start, end2) {
         end2 = Math.min(buf.length, end2);
         const res = [];
-        let i2 = start;
-        while (i2 < end2) {
-          const firstByte = buf[i2];
+        let i = start;
+        while (i < end2) {
+          const firstByte = buf[i];
           let codePoint = null;
           let bytesPerSequence = firstByte > 239 ? 4 : firstByte > 223 ? 3 : firstByte > 191 ? 2 : 1;
-          if (i2 + bytesPerSequence <= end2) {
+          if (i + bytesPerSequence <= end2) {
             let secondByte, thirdByte, fourthByte, tempCodePoint;
             switch (bytesPerSequence) {
               case 1:
@@ -946,7 +946,7 @@ var source = (() => {
                 }
                 break;
               case 2:
-                secondByte = buf[i2 + 1];
+                secondByte = buf[i + 1];
                 if ((secondByte & 192) === 128) {
                   tempCodePoint = (firstByte & 31) << 6 | secondByte & 63;
                   if (tempCodePoint > 127) {
@@ -955,8 +955,8 @@ var source = (() => {
                 }
                 break;
               case 3:
-                secondByte = buf[i2 + 1];
-                thirdByte = buf[i2 + 2];
+                secondByte = buf[i + 1];
+                thirdByte = buf[i + 2];
                 if ((secondByte & 192) === 128 && (thirdByte & 192) === 128) {
                   tempCodePoint = (firstByte & 15) << 12 | (secondByte & 63) << 6 | thirdByte & 63;
                   if (tempCodePoint > 2047 && (tempCodePoint < 55296 || tempCodePoint > 57343)) {
@@ -965,9 +965,9 @@ var source = (() => {
                 }
                 break;
               case 4:
-                secondByte = buf[i2 + 1];
-                thirdByte = buf[i2 + 2];
-                fourthByte = buf[i2 + 3];
+                secondByte = buf[i + 1];
+                thirdByte = buf[i + 2];
+                fourthByte = buf[i + 3];
                 if ((secondByte & 192) === 128 && (thirdByte & 192) === 128 && (fourthByte & 192) === 128) {
                   tempCodePoint = (firstByte & 15) << 18 | (secondByte & 63) << 12 | (thirdByte & 63) << 6 | fourthByte & 63;
                   if (tempCodePoint > 65535 && tempCodePoint < 1114112) {
@@ -985,7 +985,7 @@ var source = (() => {
             codePoint = 56320 | codePoint & 1023;
           }
           res.push(codePoint);
-          i2 += bytesPerSequence;
+          i += bytesPerSequence;
         }
         return decodeCodePointsArray(res);
       }
@@ -996,11 +996,11 @@ var source = (() => {
           return String.fromCharCode.apply(String, codePoints);
         }
         let res = "";
-        let i2 = 0;
-        while (i2 < len) {
+        let i = 0;
+        while (i < len) {
           res += String.fromCharCode.apply(
             String,
-            codePoints.slice(i2, i2 += MAX_ARGUMENTS_LENGTH)
+            codePoints.slice(i, i += MAX_ARGUMENTS_LENGTH)
           );
         }
         return res;
@@ -1008,16 +1008,16 @@ var source = (() => {
       function asciiSlice(buf, start, end2) {
         let ret = "";
         end2 = Math.min(buf.length, end2);
-        for (let i2 = start; i2 < end2; ++i2) {
-          ret += String.fromCharCode(buf[i2] & 127);
+        for (let i = start; i < end2; ++i) {
+          ret += String.fromCharCode(buf[i] & 127);
         }
         return ret;
       }
       function latin1Slice(buf, start, end2) {
         let ret = "";
         end2 = Math.min(buf.length, end2);
-        for (let i2 = start; i2 < end2; ++i2) {
-          ret += String.fromCharCode(buf[i2]);
+        for (let i = start; i < end2; ++i) {
+          ret += String.fromCharCode(buf[i]);
         }
         return ret;
       }
@@ -1026,16 +1026,16 @@ var source = (() => {
         if (!start || start < 0) start = 0;
         if (!end2 || end2 < 0 || end2 > len) end2 = len;
         let out = "";
-        for (let i2 = start; i2 < end2; ++i2) {
-          out += hexSliceLookupTable[buf[i2]];
+        for (let i = start; i < end2; ++i) {
+          out += hexSliceLookupTable[buf[i]];
         }
         return out;
       }
       function utf16leSlice(buf, start, end2) {
         const bytes = buf.slice(start, end2);
         let res = "";
-        for (let i2 = 0; i2 < bytes.length - 1; i2 += 2) {
-          res += String.fromCharCode(bytes[i2] + bytes[i2 + 1] * 256);
+        for (let i = 0; i < bytes.length - 1; i += 2) {
+          res += String.fromCharCode(bytes[i] + bytes[i + 1] * 256);
         }
         return res;
       }
@@ -1070,9 +1070,9 @@ var source = (() => {
         if (!noAssert) checkOffset(offset, byteLength2, this.length);
         let val2 = this[offset];
         let mul = 1;
-        let i2 = 0;
-        while (++i2 < byteLength2 && (mul *= 256)) {
-          val2 += this[offset + i2] * mul;
+        let i = 0;
+        while (++i < byteLength2 && (mul *= 256)) {
+          val2 += this[offset + i] * mul;
         }
         return val2;
       };
@@ -1144,9 +1144,9 @@ var source = (() => {
         if (!noAssert) checkOffset(offset, byteLength2, this.length);
         let val2 = this[offset];
         let mul = 1;
-        let i2 = 0;
-        while (++i2 < byteLength2 && (mul *= 256)) {
-          val2 += this[offset + i2] * mul;
+        let i = 0;
+        while (++i < byteLength2 && (mul *= 256)) {
+          val2 += this[offset + i] * mul;
         }
         mul *= 128;
         if (val2 >= mul) val2 -= Math.pow(2, 8 * byteLength2);
@@ -1156,11 +1156,11 @@ var source = (() => {
         offset = offset >>> 0;
         byteLength2 = byteLength2 >>> 0;
         if (!noAssert) checkOffset(offset, byteLength2, this.length);
-        let i2 = byteLength2;
+        let i = byteLength2;
         let mul = 1;
-        let val2 = this[offset + --i2];
-        while (i2 > 0 && (mul *= 256)) {
-          val2 += this[offset + --i2] * mul;
+        let val2 = this[offset + --i];
+        while (i > 0 && (mul *= 256)) {
+          val2 += this[offset + --i] * mul;
         }
         mul *= 128;
         if (val2 >= mul) val2 -= Math.pow(2, 8 * byteLength2);
@@ -1251,10 +1251,10 @@ var source = (() => {
           checkInt(this, value, offset, byteLength2, maxBytes, 0);
         }
         let mul = 1;
-        let i2 = 0;
+        let i = 0;
         this[offset] = value & 255;
-        while (++i2 < byteLength2 && (mul *= 256)) {
-          this[offset + i2] = value / mul & 255;
+        while (++i < byteLength2 && (mul *= 256)) {
+          this[offset + i] = value / mul & 255;
         }
         return offset + byteLength2;
       };
@@ -1266,11 +1266,11 @@ var source = (() => {
           const maxBytes = Math.pow(2, 8 * byteLength2) - 1;
           checkInt(this, value, offset, byteLength2, maxBytes, 0);
         }
-        let i2 = byteLength2 - 1;
+        let i = byteLength2 - 1;
         let mul = 1;
-        this[offset + i2] = value & 255;
-        while (--i2 >= 0 && (mul *= 256)) {
-          this[offset + i2] = value / mul & 255;
+        this[offset + i] = value & 255;
+        while (--i >= 0 && (mul *= 256)) {
+          this[offset + i] = value / mul & 255;
         }
         return offset + byteLength2;
       };
@@ -1370,15 +1370,15 @@ var source = (() => {
           const limit = Math.pow(2, 8 * byteLength2 - 1);
           checkInt(this, value, offset, byteLength2, limit - 1, -limit);
         }
-        let i2 = 0;
+        let i = 0;
         let mul = 1;
         let sub = 0;
         this[offset] = value & 255;
-        while (++i2 < byteLength2 && (mul *= 256)) {
-          if (value < 0 && sub === 0 && this[offset + i2 - 1] !== 0) {
+        while (++i < byteLength2 && (mul *= 256)) {
+          if (value < 0 && sub === 0 && this[offset + i - 1] !== 0) {
             sub = 1;
           }
-          this[offset + i2] = (value / mul >> 0) - sub & 255;
+          this[offset + i] = (value / mul >> 0) - sub & 255;
         }
         return offset + byteLength2;
       };
@@ -1389,15 +1389,15 @@ var source = (() => {
           const limit = Math.pow(2, 8 * byteLength2 - 1);
           checkInt(this, value, offset, byteLength2, limit - 1, -limit);
         }
-        let i2 = byteLength2 - 1;
+        let i = byteLength2 - 1;
         let mul = 1;
         let sub = 0;
-        this[offset + i2] = value & 255;
-        while (--i2 >= 0 && (mul *= 256)) {
-          if (value < 0 && sub === 0 && this[offset + i2 + 1] !== 0) {
+        this[offset + i] = value & 255;
+        while (--i >= 0 && (mul *= 256)) {
+          if (value < 0 && sub === 0 && this[offset + i + 1] !== 0) {
             sub = 1;
           }
-          this[offset + i2] = (value / mul >> 0) - sub & 255;
+          this[offset + i] = (value / mul >> 0) - sub & 255;
         }
         return offset + byteLength2;
       };
@@ -1552,10 +1552,10 @@ var source = (() => {
         start = start >>> 0;
         end2 = end2 === void 0 ? this.length : end2 >>> 0;
         if (!val2) val2 = 0;
-        let i2;
+        let i;
         if (typeof val2 === "number") {
-          for (i2 = start; i2 < end2; ++i2) {
-            this[i2] = val2;
+          for (i = start; i < end2; ++i) {
+            this[i] = val2;
           }
         } else {
           const bytes = Buffer3.isBuffer(val2) ? val2 : Buffer3.from(val2, encoding);
@@ -1563,8 +1563,8 @@ var source = (() => {
           if (len === 0) {
             throw new TypeError('The value "' + val2 + '" is invalid for argument "value"');
           }
-          for (i2 = 0; i2 < end2 - start; ++i2) {
-            this[i2 + start] = bytes[i2 % len];
+          for (i = 0; i < end2 - start; ++i) {
+            this[i + start] = bytes[i % len];
           }
         }
         return this;
@@ -1637,12 +1637,12 @@ var source = (() => {
       );
       function addNumericalSeparator(val2) {
         let res = "";
-        let i2 = val2.length;
+        let i = val2.length;
         const start = val2[0] === "-" ? 1 : 0;
-        for (; i2 >= start + 4; i2 -= 3) {
-          res = `_${val2.slice(i2 - 3, i2)}${res}`;
+        for (; i >= start + 4; i -= 3) {
+          res = `_${val2.slice(i - 3, i)}${res}`;
         }
-        return `${val2.slice(0, i2)}${res}`;
+        return `${val2.slice(0, i)}${res}`;
       }
       function checkBounds(buf, offset, byteLength2) {
         validateNumber(offset, "offset");
@@ -1702,14 +1702,14 @@ var source = (() => {
         const length = string.length;
         let leadSurrogate = null;
         const bytes = [];
-        for (let i2 = 0; i2 < length; ++i2) {
-          codePoint = string.charCodeAt(i2);
+        for (let i = 0; i < length; ++i) {
+          codePoint = string.charCodeAt(i);
           if (codePoint > 55295 && codePoint < 57344) {
             if (!leadSurrogate) {
               if (codePoint > 56319) {
                 if ((units -= 3) > -1) bytes.push(239, 191, 189);
                 continue;
-              } else if (i2 + 1 === length) {
+              } else if (i + 1 === length) {
                 if ((units -= 3) > -1) bytes.push(239, 191, 189);
                 continue;
               }
@@ -1758,17 +1758,17 @@ var source = (() => {
       }
       function asciiToBytes(str) {
         const byteArray = [];
-        for (let i2 = 0; i2 < str.length; ++i2) {
-          byteArray.push(str.charCodeAt(i2) & 255);
+        for (let i = 0; i < str.length; ++i) {
+          byteArray.push(str.charCodeAt(i) & 255);
         }
         return byteArray;
       }
       function utf16leToBytes(str, units) {
         let c, hi, lo;
         const byteArray = [];
-        for (let i2 = 0; i2 < str.length; ++i2) {
+        for (let i = 0; i < str.length; ++i) {
           if ((units -= 2) < 0) break;
-          c = str.charCodeAt(i2);
+          c = str.charCodeAt(i);
           hi = c >> 8;
           lo = c % 256;
           byteArray.push(lo);
@@ -1780,12 +1780,12 @@ var source = (() => {
         return base64.toByteArray(base64clean(str));
       }
       function blitBuffer(src, dst, offset, length) {
-        let i2;
-        for (i2 = 0; i2 < length; ++i2) {
-          if (i2 + offset >= dst.length || i2 >= src.length) break;
-          dst[i2 + offset] = src[i2];
+        let i;
+        for (i = 0; i < length; ++i) {
+          if (i + offset >= dst.length || i >= src.length) break;
+          dst[i + offset] = src[i];
         }
-        return i2;
+        return i;
       }
       function isInstance(obj, type) {
         return obj instanceof type || obj != null && obj.constructor != null && obj.constructor.name != null && obj.constructor.name === type.name;
@@ -1796,10 +1796,10 @@ var source = (() => {
       var hexSliceLookupTable = function() {
         const alphabet = "0123456789abcdef";
         const table = new Array(256);
-        for (let i2 = 0; i2 < 16; ++i2) {
-          const i16 = i2 * 16;
+        for (let i = 0; i < 16; ++i) {
+          const i16 = i * 16;
           for (let j = 0; j < 16; ++j) {
-            table[i16 + j] = alphabet[i2] + alphabet[j];
+            table[i16 + j] = alphabet[i] + alphabet[j];
           }
         }
         return table;
@@ -2168,16 +2168,16 @@ var source = (() => {
           super(id);
           this.options = options;
         }
-        async interceptRequest(request2) {
-          if (this.options.ignoreImages && this.imageRegex.test(request2.url)) {
-            return request2;
+        async interceptRequest(request) {
+          if (this.options.ignoreImages && this.imageRegex.test(request.url)) {
+            return request;
           }
           await (0, Lock_1.lock)(this.id);
           await this.incrementRequestCount();
           (0, Lock_1.unlock)(this.id);
-          return request2;
+          return request;
         }
-        async interceptResponse(request2, response, data2) {
+        async interceptResponse(request, response, data2) {
           return data2;
         }
         async incrementRequestCount() {
@@ -2543,19 +2543,19 @@ var source = (() => {
           this.options = options;
           this.loadCookiesFromStorage();
         }
-        async interceptRequest(request2) {
-          request2.cookies = {
+        async interceptRequest(request) {
+          request.cookies = {
             // Already set cookies
-            ...request2.cookies ?? {},
+            ...request.cookies ?? {},
             // Inject all the cookies as { name: value }
-            ...this.cookiesForUrl(request2.url).reduce((v, c) => {
+            ...this.cookiesForUrl(request.url).reduce((v, c) => {
               v[c.name] = c.value;
               return v;
             }, {})
           };
-          return request2;
+          return request;
         }
-        async interceptResponse(request2, response, data2) {
+        async interceptResponse(request, response, data2) {
           const cookies = this._cookies;
           for (const cookie of response.cookies) {
             const identifier = this.cookieIdentifier(cookie);
@@ -2603,9 +2603,9 @@ var source = (() => {
               continue;
             }
             let cookieDomainMatches = true;
-            for (let i2 = 0; i2 < splitCookieDomain.length; i2++) {
-              let splitCookieIndex = splitCookieDomain.length - 1 - i2;
-              let splitHostnameIndex = splitHostname.length - 1 - i2;
+            for (let i = 0; i < splitCookieDomain.length; i++) {
+              let splitCookieIndex = splitCookieDomain.length - 1 - i;
+              let splitHostnameIndex = splitHostname.length - 1 - i;
               if (splitCookieDomain[splitCookieIndex] != splitHostname[splitHostnameIndex]) {
                 cookieDomainMatches = false;
                 break;
@@ -2623,8 +2623,8 @@ var source = (() => {
             } else if (splitCookiePath.length === 0 || cookiePath === "/") {
               pathMatches = 1;
             } else if (pathname.startsWith(cookiePath) && splitUrlPath.length >= splitCookiePath.length) {
-              for (let i2 = 0; i2 < splitCookiePath.length; i2++) {
-                if (splitCookiePath[i2] === splitUrlPath[i2]) {
+              for (let i = 0; i < splitCookiePath.length; i++) {
+                if (splitCookiePath[i] === splitUrlPath[i]) {
                   pathMatches += 1;
                 } else {
                   break;
@@ -3429,9 +3429,9 @@ var source = (() => {
   }
   function cloneChildren(childs) {
     const children2 = childs.map((child) => cloneNode(child, true));
-    for (let i2 = 1; i2 < children2.length; i2++) {
-      children2[i2].prev = children2[i2 - 1];
-      children2[i2 - 1].next = children2[i2];
+    for (let i = 1; i < children2.length; i++) {
+      children2[i].prev = children2[i - 1];
+      children2[i - 1].next = children2[i];
     }
     return children2;
   }
@@ -4018,8 +4018,8 @@ var source = (() => {
   // node_modules/entities/lib/esm/generated/encode-html.js
   init_buffer();
   function restoreDiff(arr) {
-    for (let i2 = 1; i2 < arr.length; i2++) {
-      arr[i2][0] += arr[i2 - 1][0] + 1;
+    for (let i = 1; i < arr.length; i++) {
+      arr[i][0] += arr[i - 1][0] + 1;
     }
     return arr;
   }
@@ -4047,14 +4047,14 @@ var source = (() => {
     let lastIdx = 0;
     let match;
     while ((match = xmlReplacer.exec(str)) !== null) {
-      const i2 = match.index;
-      const char = str.charCodeAt(i2);
+      const i = match.index;
+      const char = str.charCodeAt(i);
       const next2 = xmlCodeMap.get(char);
       if (next2 !== void 0) {
-        ret += str.substring(lastIdx, i2) + next2;
-        lastIdx = i2 + 1;
+        ret += str.substring(lastIdx, i) + next2;
+        lastIdx = i + 1;
       } else {
-        ret += `${str.substring(lastIdx, i2)}&#x${getCodePoint(str, i2).toString(16)};`;
+        ret += `${str.substring(lastIdx, i)}&#x${getCodePoint(str, i).toString(16)};`;
         lastIdx = xmlReplacer.lastIndex += Number((char & 64512) === 55296);
       }
     }
@@ -4261,8 +4261,8 @@ var source = (() => {
   function render(node, options = {}) {
     const nodes = "length" in node ? node : [node];
     let output = "";
-    for (let i2 = 0; i2 < nodes.length; i2++) {
-      output += renderNode(nodes[i2], options);
+    for (let i = 0; i < nodes.length; i++) {
+      output += renderNode(nodes[i], options);
     }
     return output;
   }
@@ -4567,8 +4567,8 @@ var source = (() => {
   }
   function findOne(test, nodes, recurse = true) {
     const searchedNodes = Array.isArray(nodes) ? nodes : [nodes];
-    for (let i2 = 0; i2 < searchedNodes.length; i2++) {
-      const node = searchedNodes[i2];
+    for (let i = 0; i < searchedNodes.length; i++) {
+      const node = searchedNodes[i];
       if (isTag2(node) && test(node)) {
         return node;
       }
@@ -4736,7 +4736,7 @@ var source = (() => {
     return DocumentPosition.PRECEDING;
   }
   function uniqueSort(nodes) {
-    nodes = nodes.filter((node, i2, arr) => !arr.includes(node, i2 + 1));
+    nodes = nodes.filter((node, i, arr) => !arr.includes(node, i + 1));
     nodes.sort((a, b) => {
       const relative = compareDocumentPosition(a, b);
       if (relative & DocumentPosition.PRECEDING) {
@@ -4923,8 +4923,8 @@ var source = (() => {
   function text(elements) {
     const elems = elements !== null && elements !== void 0 ? elements : this ? this.root() : [];
     let ret = "";
-    for (let i2 = 0; i2 < elems.length; i2++) {
-      ret += textContent(elems[i2]);
+    for (let i = 0; i < elems.length; i++) {
+      ret += textContent(elems[i]);
     }
     return ret;
   }
@@ -4966,8 +4966,8 @@ var source = (() => {
     }
     let newLength = arr1.length;
     const len = +arr2.length;
-    for (let i2 = 0; i2 < len; i2++) {
-      arr1[newLength++] = arr2[i2];
+    for (let i = 0; i < len; i++) {
+      arr1[newLength++] = arr2[i];
     }
     arr1.length = newLength;
     return arr1;
@@ -4979,8 +4979,8 @@ var source = (() => {
     if (typeof item !== "object" || item === null || !("length" in item) || typeof item.length !== "number" || item.length < 0) {
       return false;
     }
-    for (let i2 = 0; i2 < item.length; i2++) {
-      if (!(i2 in item)) {
+    for (let i = 0; i < item.length; i++) {
+      if (!(i in item)) {
         return false;
       }
     }
@@ -5024,8 +5024,8 @@ var source = (() => {
   }
   function domEach(array, fn) {
     const len = array.length;
-    for (let i2 = 0; i2 < len; i2++)
-      fn(array[i2], i2);
+    for (let i = 0; i < len; i++)
+      fn(array[i], i);
     return array;
   }
   var CharacterCodes;
@@ -5084,9 +5084,9 @@ var source = (() => {
             throw new Error("Bad combination of arguments.");
           }
         }
-        return domEach(this, (el, i2) => {
+        return domEach(this, (el, i) => {
           if (isTag2(el))
-            setAttr(el, name, value.call(el, i2, el.attribs[name]));
+            setAttr(el, name, value.call(el, i, el.attribs[name]));
         });
       }
       return domEach(this, (el) => {
@@ -5127,8 +5127,8 @@ var source = (() => {
         case "style": {
           const property = this.css();
           const keys = Object.keys(property);
-          for (let i2 = 0; i2 < keys.length; i2++) {
-            property[i2] = keys[i2];
+          for (let i = 0; i < keys.length; i++) {
+            property[i] = keys[i];
           }
           property.length = keys.length;
           return property;
@@ -5167,9 +5167,9 @@ var source = (() => {
         if (typeof name === "object") {
           throw new TypeError("Bad combination of arguments.");
         }
-        return domEach(this, (el, i2) => {
+        return domEach(this, (el, i) => {
           if (isTag2(el)) {
-            setProp(el, name, value.call(el, i2, getProp(el, name, this.options.xmlMode)), this.options.xmlMode);
+            setProp(el, name, value.call(el, i, getProp(el, name, this.options.xmlMode)), this.options.xmlMode);
           }
         });
       }
@@ -5327,10 +5327,10 @@ var source = (() => {
   }
   function addClass(value) {
     if (typeof value === "function") {
-      return domEach(this, (el, i2) => {
+      return domEach(this, (el, i) => {
         if (isTag2(el)) {
           const className = el.attribs["class"] || "";
-          addClass.call([el], value.call(el, i2, className));
+          addClass.call([el], value.call(el, i, className));
         }
       });
     }
@@ -5338,8 +5338,8 @@ var source = (() => {
       return this;
     const classNames = value.split(rspace);
     const numElements = this.length;
-    for (let i2 = 0; i2 < numElements; i2++) {
-      const el = this[i2];
+    for (let i = 0; i < numElements; i++) {
+      const el = this[i];
       if (!isTag2(el))
         continue;
       const className = getAttr(el, "class", false);
@@ -5359,9 +5359,9 @@ var source = (() => {
   }
   function removeClass(name) {
     if (typeof name === "function") {
-      return domEach(this, (el, i2) => {
+      return domEach(this, (el, i) => {
         if (isTag2(el)) {
-          removeClass.call([el], name.call(el, i2, el.attribs["class"] || ""));
+          removeClass.call([el], name.call(el, i, el.attribs["class"] || ""));
         }
       });
     }
@@ -5392,9 +5392,9 @@ var source = (() => {
   }
   function toggleClass(value, stateVal) {
     if (typeof value === "function") {
-      return domEach(this, (el, i2) => {
+      return domEach(this, (el, i) => {
         if (isTag2(el)) {
-          toggleClass.call([el], value.call(el, i2, el.attribs["class"] || "", stateVal), stateVal);
+          toggleClass.call([el], value.call(el, i, el.attribs["class"] || "", stateVal), stateVal);
         }
       });
     }
@@ -5404,8 +5404,8 @@ var source = (() => {
     const numClasses = classNames.length;
     const state = typeof stateVal === "boolean" ? stateVal ? 1 : -1 : 0;
     const numElements = this.length;
-    for (let i2 = 0; i2 < numElements; i2++) {
-      const el = this[i2];
+    for (let i = 0; i < numElements; i++) {
+      const el = this[i];
       if (!isTag2(el))
         continue;
       const elementClasses = splitNames(el.attribs["class"]);
@@ -5869,11 +5869,11 @@ var source = (() => {
   ]);
   function sortByProcedure(arr) {
     const procs = arr.map(getProcedure);
-    for (let i2 = 1; i2 < arr.length; i2++) {
-      const procNew = procs[i2];
+    for (let i = 1; i < arr.length; i++) {
+      const procNew = procs[i];
       if (procNew < 0)
         continue;
-      for (let j = i2 - 1; j >= 0 && procNew < procs[j]; j--) {
+      for (let j = i - 1; j >= 0 && procNew < procs[j]; j--) {
         const token = arr[j + 1];
         arr[j + 1] = arr[j];
         arr[j] = token;
@@ -6213,10 +6213,10 @@ var source = (() => {
       return function nthChild(elem) {
         const siblings2 = adapter2.getSiblings(elem);
         let pos = 0;
-        for (let i2 = 0; i2 < siblings2.length; i2++) {
-          if (equals(elem, siblings2[i2]))
+        for (let i = 0; i < siblings2.length; i++) {
+          if (equals(elem, siblings2[i]))
             break;
-          if (adapter2.isTag(siblings2[i2])) {
+          if (adapter2.isTag(siblings2[i])) {
             pos++;
           }
         }
@@ -6232,10 +6232,10 @@ var source = (() => {
       return function nthLastChild(elem) {
         const siblings2 = adapter2.getSiblings(elem);
         let pos = 0;
-        for (let i2 = siblings2.length - 1; i2 >= 0; i2--) {
-          if (equals(elem, siblings2[i2]))
+        for (let i = siblings2.length - 1; i >= 0; i--) {
+          if (equals(elem, siblings2[i]))
             break;
-          if (adapter2.isTag(siblings2[i2])) {
+          if (adapter2.isTag(siblings2[i])) {
             pos++;
           }
         }
@@ -6251,8 +6251,8 @@ var source = (() => {
       return function nthOfType(elem) {
         const siblings2 = adapter2.getSiblings(elem);
         let pos = 0;
-        for (let i2 = 0; i2 < siblings2.length; i2++) {
-          const currentSibling = siblings2[i2];
+        for (let i = 0; i < siblings2.length; i++) {
+          const currentSibling = siblings2[i];
           if (equals(elem, currentSibling))
             break;
           if (adapter2.isTag(currentSibling) && adapter2.getName(currentSibling) === adapter2.getName(elem)) {
@@ -6271,8 +6271,8 @@ var source = (() => {
       return function nthLastOfType(elem) {
         const siblings2 = adapter2.getSiblings(elem);
         let pos = 0;
-        for (let i2 = siblings2.length - 1; i2 >= 0; i2--) {
-          const currentSibling = siblings2[i2];
+        for (let i = siblings2.length - 1; i >= 0; i--) {
+          const currentSibling = siblings2[i];
           if (equals(elem, currentSibling))
             break;
           if (adapter2.isTag(currentSibling) && adapter2.getName(currentSibling) === adapter2.getName(elem)) {
@@ -6333,10 +6333,10 @@ var source = (() => {
     },
     "last-child"(elem, { adapter: adapter2, equals }) {
       const siblings2 = adapter2.getSiblings(elem);
-      for (let i2 = siblings2.length - 1; i2 >= 0; i2--) {
-        if (equals(elem, siblings2[i2]))
+      for (let i = siblings2.length - 1; i >= 0; i--) {
+        if (equals(elem, siblings2[i]))
           return true;
-        if (adapter2.isTag(siblings2[i2]))
+        if (adapter2.isTag(siblings2[i]))
           break;
       }
       return false;
@@ -6344,8 +6344,8 @@ var source = (() => {
     "first-of-type"(elem, { adapter: adapter2, equals }) {
       const siblings2 = adapter2.getSiblings(elem);
       const elemName = adapter2.getName(elem);
-      for (let i2 = 0; i2 < siblings2.length; i2++) {
-        const currentSibling = siblings2[i2];
+      for (let i = 0; i < siblings2.length; i++) {
+        const currentSibling = siblings2[i];
         if (equals(elem, currentSibling))
           return true;
         if (adapter2.isTag(currentSibling) && adapter2.getName(currentSibling) === elemName) {
@@ -6357,8 +6357,8 @@ var source = (() => {
     "last-of-type"(elem, { adapter: adapter2, equals }) {
       const siblings2 = adapter2.getSiblings(elem);
       const elemName = adapter2.getName(elem);
-      for (let i2 = siblings2.length - 1; i2 >= 0; i2--) {
-        const currentSibling = siblings2[i2];
+      for (let i = siblings2.length - 1; i >= 0; i--) {
+        const currentSibling = siblings2[i];
         if (equals(elem, currentSibling))
           return true;
         if (adapter2.isTag(currentSibling) && adapter2.getName(currentSibling) === elemName) {
@@ -6618,8 +6618,8 @@ var source = (() => {
       case SelectorType.Sibling: {
         return function sibling(elem) {
           const siblings2 = adapter2.getSiblings(elem);
-          for (let i2 = 0; i2 < siblings2.length; i2++) {
-            const currentSibling = siblings2[i2];
+          for (let i = 0; i < siblings2.length; i++) {
+            const currentSibling = siblings2[i];
             if (equals(elem, currentSibling))
               break;
             if (adapter2.isTag(currentSibling) && next2(currentSibling)) {
@@ -6639,8 +6639,8 @@ var source = (() => {
         return function adjacent(elem) {
           const siblings2 = adapter2.getSiblings(elem);
           let lastElement;
-          for (let i2 = 0; i2 < siblings2.length; i2++) {
-            const currentSibling = siblings2[i2];
+          for (let i = 0; i < siblings2.length; i++) {
+            const currentSibling = siblings2[i];
             if (equals(elem, currentSibling))
               break;
             if (adapter2.isTag(currentSibling)) {
@@ -6779,8 +6779,8 @@ var source = (() => {
   function appendNextSiblings(elem, adapter2) {
     const elems = Array.isArray(elem) ? elem.slice(0) : [elem];
     const elemsLength = elems.length;
-    for (let i2 = 0; i2 < elemsLength; i2++) {
-      const nextSiblings = getNextSiblings(elems[i2], adapter2);
+    for (let i = 0; i < elemsLength; i++) {
+      const nextSiblings = getNextSiblings(elems[i], adapter2);
       elems.push(...nextSiblings);
     }
     return elems;
@@ -6890,9 +6890,9 @@ var source = (() => {
       case "gt":
         return isFinite(num) ? elems.slice(num + 1) : [];
       case "even":
-        return elems.filter((_, i2) => i2 % 2 === 0);
+        return elems.filter((_, i) => i % 2 === 0);
       case "odd":
-        return elems.filter((_, i2) => i2 % 2 === 1);
+        return elems.filter((_, i) => i % 2 === 1);
       case "not": {
         const filtered = new Set(filterParsed(data2, elems, options));
         return elems.filter((e) => !filtered.has(e));
@@ -6916,15 +6916,15 @@ var source = (() => {
         found = new Set(filtered);
       }
     }
-    for (let i2 = 0; i2 < filteredSelectors.length && (found === null || found === void 0 ? void 0 : found.size) !== elements.length; i2++) {
-      const filteredSelector = filteredSelectors[i2];
+    for (let i = 0; i < filteredSelectors.length && (found === null || found === void 0 ? void 0 : found.size) !== elements.length; i++) {
+      const filteredSelector = filteredSelectors[i];
       const missing = found ? elements.filter((e) => isTag2(e) && !found.has(e)) : elements;
       if (missing.length === 0)
         break;
       const filtered = filterBySelector(filteredSelector, elements, options);
       if (filtered.length) {
         if (!found) {
-          if (i2 === filteredSelectors.length - 1) {
+          if (i === filteredSelectors.length - 1) {
             return filtered;
           }
           found = new Set(filtered);
@@ -7072,8 +7072,8 @@ var source = (() => {
   }
   var _matcher = _getMatcher((fn, elems) => {
     let ret = [];
-    for (let i2 = 0; i2 < elems.length; i2++) {
-      const value = fn(elems[i2]);
+    for (let i = 0; i < elems.length; i++) {
+      const value = fn(elems[i]);
       if (value.length > 0)
         ret = ret.concat(value);
     }
@@ -7081,8 +7081,8 @@ var source = (() => {
   });
   var _singleMatcher = _getMatcher((fn, elems) => {
     const ret = [];
-    for (let i2 = 0; i2 < elems.length; i2++) {
-      const value = fn(elems[i2]);
+    for (let i = 0; i < elems.length; i++) {
+      const value = fn(elems[i]);
       if (value !== null) {
         ret.push(value);
       }
@@ -7178,17 +7178,17 @@ var source = (() => {
     return this._make(elems);
   }
   function each(fn) {
-    let i2 = 0;
+    let i = 0;
     const len = this.length;
-    while (i2 < len && fn.call(this[i2], i2, this[i2]) !== false)
-      ++i2;
+    while (i < len && fn.call(this[i], i, this[i]) !== false)
+      ++i;
     return this;
   }
   function map(fn) {
     let elems = [];
-    for (let i2 = 0; i2 < this.length; i2++) {
-      const el = this[i2];
-      const val2 = fn.call(el, i2, el);
+    for (let i = 0; i < this.length; i++) {
+      const el = this[i];
+      const val2 = fn.call(el, i, el);
       if (val2 != null) {
         elems = elems.concat(val2);
       }
@@ -7197,7 +7197,7 @@ var source = (() => {
   }
   function getFilterFn(match) {
     if (typeof match === "function") {
-      return (el, i2) => match.call(el, i2, el);
+      return (el, i) => match.call(el, i, el);
     }
     if (isCheerio(match)) {
       return (el) => Array.prototype.includes.call(match, el);
@@ -7224,7 +7224,7 @@ var source = (() => {
       nodes = nodes.filter((el) => !matches.has(el));
     } else {
       const filterFn = getFilterFn(match);
-      nodes = nodes.filter((el, i2) => !filterFn(el, i2));
+      nodes = nodes.filter((el, i) => !filterFn(el, i));
     }
     return this._make(nodes);
   }
@@ -7240,20 +7240,20 @@ var source = (() => {
   function last() {
     return this.length > 0 ? this._make(this[this.length - 1]) : this;
   }
-  function eq(i2) {
+  function eq(i) {
     var _a3;
-    i2 = +i2;
-    if (i2 === 0 && this.length <= 1)
+    i = +i;
+    if (i === 0 && this.length <= 1)
       return this;
-    if (i2 < 0)
-      i2 = this.length + i2;
-    return this._make((_a3 = this[i2]) !== null && _a3 !== void 0 ? _a3 : []);
+    if (i < 0)
+      i = this.length + i;
+    return this._make((_a3 = this[i]) !== null && _a3 !== void 0 ? _a3 : []);
   }
-  function get(i2) {
-    if (i2 == null) {
+  function get(i) {
+    if (i == null) {
       return this.toArray();
     }
-    return this[i2 < 0 ? this.length + i2 : i2];
+    return this[i < 0 ? this.length + i : i];
   }
   function toArray() {
     return Array.prototype.slice.call(this);
@@ -7341,14 +7341,14 @@ var source = (() => {
     } else {
       parent2 = null;
     }
-    for (let i2 = 0; i2 < arr.length; i2++) {
-      const node = arr[i2];
+    for (let i = 0; i < arr.length; i++) {
+      const node = arr[i];
       if (node.parent && node.parent.children !== arr) {
         removeElement(node);
       }
       if (parent2) {
-        node.prev = arr[i2 - 1] || null;
-        node.next = arr[i2 + 1] || null;
+        node.prev = arr[i - 1] || null;
+        node.next = arr[i + 1] || null;
       } else {
         node.prev = node.next = null;
       }
@@ -7370,8 +7370,8 @@ var source = (() => {
         return this._makeDomArray(elem[0], clone2);
       }
       const result = [];
-      for (let i2 = 0; i2 < elem.length; i2++) {
-        const el = elem[i2];
+      for (let i = 0; i < elem.length; i++) {
+        const el = elem[i];
         if (typeof el === "object") {
           if (el == null) {
             continue;
@@ -7390,11 +7390,11 @@ var source = (() => {
   function _insert(concatenator) {
     return function(...elems) {
       const lastIdx = this.length - 1;
-      return domEach(this, (el, i2) => {
+      return domEach(this, (el, i) => {
         if (!hasChildren(el))
           return;
-        const domSrc = typeof elems[0] === "function" ? elems[0].call(el, i2, this._render(el.children)) : elems;
-        const dom = this._makeDomArray(domSrc, i2 < lastIdx);
+        const domSrc = typeof elems[0] === "function" ? elems[0].call(el, i, this._render(el.children)) : elems;
+        const dom = this._makeDomArray(domSrc, i < lastIdx);
         concatenator(dom, el.children, el);
       });
     };
@@ -7459,10 +7459,10 @@ var source = (() => {
     return function(wrapper) {
       const lastIdx = this.length - 1;
       const lastParent = this.parents().last();
-      for (let i2 = 0; i2 < this.length; i2++) {
-        const el = this[i2];
-        const wrap2 = typeof wrapper === "function" ? wrapper.call(el, i2, el) : typeof wrapper === "string" && !isHtml(wrapper) ? lastParent.find(wrapper).clone() : wrapper;
-        const [wrapperDom] = this._makeDomArray(wrap2, i2 < lastIdx);
+      for (let i = 0; i < this.length; i++) {
+        const el = this[i];
+        const wrap2 = typeof wrapper === "function" ? wrapper.call(el, i, el) : typeof wrapper === "string" && !isHtml(wrapper) ? lastParent.find(wrapper).clone() : wrapper;
+        const [wrapperDom] = this._makeDomArray(wrap2, i < lastIdx);
         if (!wrapperDom || !hasChildren(wrapperDom))
           continue;
         let elInsertLocation = wrapperDom;
@@ -7507,9 +7507,9 @@ var source = (() => {
     if (el) {
       const wrap2 = this._make(typeof wrapper === "function" ? wrapper.call(el, 0, el) : wrapper).insertBefore(el);
       let elInsertLocation;
-      for (let i2 = 0; i2 < wrap2.length; i2++) {
-        if (wrap2[i2].type === "tag")
-          elInsertLocation = wrap2[i2];
+      for (let i = 0; i < wrap2.length; i++) {
+        if (wrap2[i].type === "tag")
+          elInsertLocation = wrap2[i];
       }
       let j = 0;
       while (elInsertLocation && j < elInsertLocation.children.length) {
@@ -7528,7 +7528,7 @@ var source = (() => {
   }
   function after(...elems) {
     const lastIdx = this.length - 1;
-    return domEach(this, (el, i2) => {
+    return domEach(this, (el, i) => {
       if (!hasChildren(el) || !el.parent) {
         return;
       }
@@ -7536,8 +7536,8 @@ var source = (() => {
       const index2 = siblings2.indexOf(el);
       if (index2 < 0)
         return;
-      const domSrc = typeof elems[0] === "function" ? elems[0].call(el, i2, this._render(el.children)) : elems;
-      const dom = this._makeDomArray(domSrc, i2 < lastIdx);
+      const domSrc = typeof elems[0] === "function" ? elems[0].call(el, i, this._render(el.children)) : elems;
+      const dom = this._makeDomArray(domSrc, i < lastIdx);
       uniqueSplice(siblings2, index2 + 1, 0, dom, el.parent);
     });
   }
@@ -7564,7 +7564,7 @@ var source = (() => {
   }
   function before(...elems) {
     const lastIdx = this.length - 1;
-    return domEach(this, (el, i2) => {
+    return domEach(this, (el, i) => {
       if (!hasChildren(el) || !el.parent) {
         return;
       }
@@ -7572,8 +7572,8 @@ var source = (() => {
       const index2 = siblings2.indexOf(el);
       if (index2 < 0)
         return;
-      const domSrc = typeof elems[0] === "function" ? elems[0].call(el, i2, this._render(el.children)) : elems;
-      const dom = this._makeDomArray(domSrc, i2 < lastIdx);
+      const domSrc = typeof elems[0] === "function" ? elems[0].call(el, i, this._render(el.children)) : elems;
+      const dom = this._makeDomArray(domSrc, i < lastIdx);
       uniqueSplice(siblings2, index2, 0, dom, el.parent);
     });
   }
@@ -7605,13 +7605,13 @@ var source = (() => {
     return this;
   }
   function replaceWith(content) {
-    return domEach(this, (el, i2) => {
+    return domEach(this, (el, i) => {
       const { parent: parent2 } = el;
       if (!parent2) {
         return;
       }
       const siblings2 = parent2.children;
-      const cont = typeof content === "function" ? content.call(el, i2, el) : content;
+      const cont = typeof content === "function" ? content.call(el, i, el) : content;
       const dom = this._makeDomArray(cont);
       update(dom, null);
       const index2 = siblings2.indexOf(el);
@@ -7656,7 +7656,7 @@ var source = (() => {
       return text(this);
     }
     if (typeof str === "function") {
-      return domEach(this, (el, i2) => this._make(el).text(str.call(el, i2, text([el]))));
+      return domEach(this, (el, i) => this._make(el).text(str.call(el, i, text([el]))));
     }
     return domEach(this, (el) => {
       if (!hasChildren(el))
@@ -7686,9 +7686,9 @@ var source = (() => {
   function css(prop2, val2) {
     if (prop2 != null && val2 != null || // When `prop` is a "plain" object
     typeof prop2 === "object" && !Array.isArray(prop2)) {
-      return domEach(this, (el, i2) => {
+      return domEach(this, (el, i) => {
         if (isTag2(el)) {
-          setCss(el, prop2, val2, i2);
+          setCss(el, prop2, val2, i);
         }
       });
     }
@@ -7709,9 +7709,9 @@ var source = (() => {
       el.attribs["style"] = stringify(styles);
     } else if (typeof prop2 === "object") {
       const keys = Object.keys(prop2);
-      for (let i2 = 0; i2 < keys.length; i2++) {
-        const k = keys[i2];
-        setCss(el, k, prop2[k], i2);
+      for (let i = 0; i < keys.length; i++) {
+        const k = keys[i];
+        setCss(el, k, prop2[k], i);
       }
     }
   }
@@ -7826,8 +7826,8 @@ var source = (() => {
       if (isArray) {
         ret[key] = this._findBySelector(selector, Number.POSITIVE_INFINITY).map((_, el) => fn(el, key, ret)).get();
       } else {
-        const $3 = this._findBySelector(selector, 1);
-        ret[key] = $3.length > 0 ? fn($3[0], key, ret) : void 0;
+        const $2 = this._findBySelector(selector, 1);
+        ret[key] = $2.length > 0 ? fn($2[0], key, ret) : void 0;
       }
     }
     return ret;
@@ -8219,9 +8219,9 @@ var source = (() => {
       if (caseSensitive) {
         return this.html.startsWith(pattern, this.pos);
       }
-      for (let i2 = 0; i2 < pattern.length; i2++) {
-        const cp = this.html.charCodeAt(this.pos + i2) | 32;
-        if (cp !== pattern.charCodeAt(i2)) {
+      for (let i = 0; i < pattern.length; i++) {
+        const cp = this.html.charCodeAt(this.pos + i) | 32;
+        if (cp !== pattern.charCodeAt(i)) {
           return false;
         }
       }
@@ -8304,9 +8304,9 @@ var source = (() => {
     TokenType2[TokenType2["HIBERNATION"] = 8] = "HIBERNATION";
   })(TokenType || (TokenType = {}));
   function getTokenAttr(token, attrName) {
-    for (let i2 = token.attrs.length - 1; i2 >= 0; i2--) {
-      if (token.attrs[i2].name === attrName) {
-        return token.attrs[i2].value;
+    for (let i = token.attrs.length - 1; i >= 0; i--) {
+      if (token.attrs[i].name === attrName) {
+        return token.attrs[i].value;
       }
     }
     return null;
@@ -9138,98 +9138,98 @@ var source = (() => {
     var _a3;
     return (_a3 = TAG_NAME_TO_ID.get(tagName)) !== null && _a3 !== void 0 ? _a3 : TAG_ID.UNKNOWN;
   }
-  var $2 = TAG_ID;
+  var $ = TAG_ID;
   var SPECIAL_ELEMENTS = {
     [NS.HTML]: /* @__PURE__ */ new Set([
-      $2.ADDRESS,
-      $2.APPLET,
-      $2.AREA,
-      $2.ARTICLE,
-      $2.ASIDE,
-      $2.BASE,
-      $2.BASEFONT,
-      $2.BGSOUND,
-      $2.BLOCKQUOTE,
-      $2.BODY,
-      $2.BR,
-      $2.BUTTON,
-      $2.CAPTION,
-      $2.CENTER,
-      $2.COL,
-      $2.COLGROUP,
-      $2.DD,
-      $2.DETAILS,
-      $2.DIR,
-      $2.DIV,
-      $2.DL,
-      $2.DT,
-      $2.EMBED,
-      $2.FIELDSET,
-      $2.FIGCAPTION,
-      $2.FIGURE,
-      $2.FOOTER,
-      $2.FORM,
-      $2.FRAME,
-      $2.FRAMESET,
-      $2.H1,
-      $2.H2,
-      $2.H3,
-      $2.H4,
-      $2.H5,
-      $2.H6,
-      $2.HEAD,
-      $2.HEADER,
-      $2.HGROUP,
-      $2.HR,
-      $2.HTML,
-      $2.IFRAME,
-      $2.IMG,
-      $2.INPUT,
-      $2.LI,
-      $2.LINK,
-      $2.LISTING,
-      $2.MAIN,
-      $2.MARQUEE,
-      $2.MENU,
-      $2.META,
-      $2.NAV,
-      $2.NOEMBED,
-      $2.NOFRAMES,
-      $2.NOSCRIPT,
-      $2.OBJECT,
-      $2.OL,
-      $2.P,
-      $2.PARAM,
-      $2.PLAINTEXT,
-      $2.PRE,
-      $2.SCRIPT,
-      $2.SECTION,
-      $2.SELECT,
-      $2.SOURCE,
-      $2.STYLE,
-      $2.SUMMARY,
-      $2.TABLE,
-      $2.TBODY,
-      $2.TD,
-      $2.TEMPLATE,
-      $2.TEXTAREA,
-      $2.TFOOT,
-      $2.TH,
-      $2.THEAD,
-      $2.TITLE,
-      $2.TR,
-      $2.TRACK,
-      $2.UL,
-      $2.WBR,
-      $2.XMP
+      $.ADDRESS,
+      $.APPLET,
+      $.AREA,
+      $.ARTICLE,
+      $.ASIDE,
+      $.BASE,
+      $.BASEFONT,
+      $.BGSOUND,
+      $.BLOCKQUOTE,
+      $.BODY,
+      $.BR,
+      $.BUTTON,
+      $.CAPTION,
+      $.CENTER,
+      $.COL,
+      $.COLGROUP,
+      $.DD,
+      $.DETAILS,
+      $.DIR,
+      $.DIV,
+      $.DL,
+      $.DT,
+      $.EMBED,
+      $.FIELDSET,
+      $.FIGCAPTION,
+      $.FIGURE,
+      $.FOOTER,
+      $.FORM,
+      $.FRAME,
+      $.FRAMESET,
+      $.H1,
+      $.H2,
+      $.H3,
+      $.H4,
+      $.H5,
+      $.H6,
+      $.HEAD,
+      $.HEADER,
+      $.HGROUP,
+      $.HR,
+      $.HTML,
+      $.IFRAME,
+      $.IMG,
+      $.INPUT,
+      $.LI,
+      $.LINK,
+      $.LISTING,
+      $.MAIN,
+      $.MARQUEE,
+      $.MENU,
+      $.META,
+      $.NAV,
+      $.NOEMBED,
+      $.NOFRAMES,
+      $.NOSCRIPT,
+      $.OBJECT,
+      $.OL,
+      $.P,
+      $.PARAM,
+      $.PLAINTEXT,
+      $.PRE,
+      $.SCRIPT,
+      $.SECTION,
+      $.SELECT,
+      $.SOURCE,
+      $.STYLE,
+      $.SUMMARY,
+      $.TABLE,
+      $.TBODY,
+      $.TD,
+      $.TEMPLATE,
+      $.TEXTAREA,
+      $.TFOOT,
+      $.TH,
+      $.THEAD,
+      $.TITLE,
+      $.TR,
+      $.TRACK,
+      $.UL,
+      $.WBR,
+      $.XMP
     ]),
-    [NS.MATHML]: /* @__PURE__ */ new Set([$2.MI, $2.MO, $2.MN, $2.MS, $2.MTEXT, $2.ANNOTATION_XML]),
-    [NS.SVG]: /* @__PURE__ */ new Set([$2.TITLE, $2.FOREIGN_OBJECT, $2.DESC]),
+    [NS.MATHML]: /* @__PURE__ */ new Set([$.MI, $.MO, $.MN, $.MS, $.MTEXT, $.ANNOTATION_XML]),
+    [NS.SVG]: /* @__PURE__ */ new Set([$.TITLE, $.FOREIGN_OBJECT, $.DESC]),
     [NS.XLINK]: /* @__PURE__ */ new Set(),
     [NS.XML]: /* @__PURE__ */ new Set(),
     [NS.XMLNS]: /* @__PURE__ */ new Set()
   };
-  var NUMBERED_HEADERS = /* @__PURE__ */ new Set([$2.H1, $2.H2, $2.H3, $2.H4, $2.H5, $2.H6]);
+  var NUMBERED_HEADERS = /* @__PURE__ */ new Set([$.H1, $.H2, $.H3, $.H4, $.H5, $.H6]);
   var UNESCAPED_TEXT = /* @__PURE__ */ new Set([
     TAG_NAMES.STYLE,
     TAG_NAMES.SCRIPT,
@@ -9479,7 +9479,7 @@ var source = (() => {
     }
     _advanceBy(count) {
       this.consumedAfterSnapshot += count;
-      for (let i2 = 0; i2 < count; i2++) {
+      for (let i = 0; i < count; i++) {
         this.preprocessor.advance();
       }
     }
@@ -10499,7 +10499,7 @@ var source = (() => {
     _stateScriptDataDoubleEscapeStart(cp) {
       if (this.preprocessor.startsWith(SEQUENCES.SCRIPT, false) && isScriptDataDoubleEscapeSequenceEnd(this.preprocessor.peek(SEQUENCES.SCRIPT.length))) {
         this._emitCodePoint(cp);
-        for (let i2 = 0; i2 < SEQUENCES.SCRIPT.length; i2++) {
+        for (let i = 0; i < SEQUENCES.SCRIPT.length; i++) {
           this._emitCodePoint(this._consume());
         }
         this.state = State.SCRIPT_DATA_DOUBLE_ESCAPED;
@@ -10619,7 +10619,7 @@ var source = (() => {
     _stateScriptDataDoubleEscapeEnd(cp) {
       if (this.preprocessor.startsWith(SEQUENCES.SCRIPT, false) && isScriptDataDoubleEscapeSequenceEnd(this.preprocessor.peek(SEQUENCES.SCRIPT.length))) {
         this._emitCodePoint(cp);
-        for (let i2 = 0; i2 < SEQUENCES.SCRIPT.length; i2++) {
+        for (let i = 0; i < SEQUENCES.SCRIPT.length; i++) {
           this._emitCodePoint(this._consume());
         }
         this.state = State.SCRIPT_DATA_ESCAPED;
@@ -11995,9 +11995,9 @@ var source = (() => {
       this.shortenToLength(1);
     }
     _indexOfTagNames(tagNames, namespace) {
-      for (let i2 = this.stackTop; i2 >= 0; i2--) {
-        if (tagNames.has(this.tagIDs[i2]) && this.treeAdapter.getNamespaceURI(this.items[i2]) === namespace) {
-          return i2;
+      for (let i = this.stackTop; i >= 0; i--) {
+        if (tagNames.has(this.tagIDs[i]) && this.treeAdapter.getNamespaceURI(this.items[i]) === namespace) {
+          return i;
         }
       }
       return -1;
@@ -12045,9 +12045,9 @@ var source = (() => {
     }
     //Element in scope
     hasInDynamicScope(tagName, htmlScope) {
-      for (let i2 = this.stackTop; i2 >= 0; i2--) {
-        const tn = this.tagIDs[i2];
-        switch (this.treeAdapter.getNamespaceURI(this.items[i2])) {
+      for (let i = this.stackTop; i >= 0; i--) {
+        const tn = this.tagIDs[i];
+        switch (this.treeAdapter.getNamespaceURI(this.items[i])) {
           case NS.HTML: {
             if (tn === tagName)
               return true;
@@ -12079,9 +12079,9 @@ var source = (() => {
       return this.hasInDynamicScope(tagName, SCOPING_ELEMENTS_HTML_BUTTON);
     }
     hasNumberedHeaderInScope() {
-      for (let i2 = this.stackTop; i2 >= 0; i2--) {
-        const tn = this.tagIDs[i2];
-        switch (this.treeAdapter.getNamespaceURI(this.items[i2])) {
+      for (let i = this.stackTop; i >= 0; i--) {
+        const tn = this.tagIDs[i];
+        switch (this.treeAdapter.getNamespaceURI(this.items[i])) {
           case NS.HTML: {
             if (NUMBERED_HEADERS.has(tn))
               return true;
@@ -12104,11 +12104,11 @@ var source = (() => {
       return true;
     }
     hasInTableScope(tagName) {
-      for (let i2 = this.stackTop; i2 >= 0; i2--) {
-        if (this.treeAdapter.getNamespaceURI(this.items[i2]) !== NS.HTML) {
+      for (let i = this.stackTop; i >= 0; i--) {
+        if (this.treeAdapter.getNamespaceURI(this.items[i]) !== NS.HTML) {
           continue;
         }
-        switch (this.tagIDs[i2]) {
+        switch (this.tagIDs[i]) {
           case tagName: {
             return true;
           }
@@ -12121,11 +12121,11 @@ var source = (() => {
       return true;
     }
     hasTableBodyContextInTableScope() {
-      for (let i2 = this.stackTop; i2 >= 0; i2--) {
-        if (this.treeAdapter.getNamespaceURI(this.items[i2]) !== NS.HTML) {
+      for (let i = this.stackTop; i >= 0; i--) {
+        if (this.treeAdapter.getNamespaceURI(this.items[i]) !== NS.HTML) {
           continue;
         }
-        switch (this.tagIDs[i2]) {
+        switch (this.tagIDs[i]) {
           case TAG_ID.TBODY:
           case TAG_ID.THEAD:
           case TAG_ID.TFOOT: {
@@ -12140,11 +12140,11 @@ var source = (() => {
       return true;
     }
     hasInSelectScope(tagName) {
-      for (let i2 = this.stackTop; i2 >= 0; i2--) {
-        if (this.treeAdapter.getNamespaceURI(this.items[i2]) !== NS.HTML) {
+      for (let i = this.stackTop; i >= 0; i--) {
+        if (this.treeAdapter.getNamespaceURI(this.items[i]) !== NS.HTML) {
           continue;
         }
-        switch (this.tagIDs[i2]) {
+        switch (this.tagIDs[i]) {
           case tagName: {
             return true;
           }
@@ -12200,8 +12200,8 @@ var source = (() => {
       const neAttrsLength = neAttrs.length;
       const neTagName = this.treeAdapter.getTagName(newElement);
       const neNamespaceURI = this.treeAdapter.getNamespaceURI(newElement);
-      for (let i2 = 0; i2 < this.entries.length; i2++) {
-        const entry = this.entries[i2];
+      for (let i = 0; i < this.entries.length; i++) {
+        const entry = this.entries[i];
         if (entry.type === EntryType.Marker) {
           break;
         }
@@ -12209,7 +12209,7 @@ var source = (() => {
         if (this.treeAdapter.getTagName(element) === neTagName && this.treeAdapter.getNamespaceURI(element) === neNamespaceURI) {
           const elementAttrs = this.treeAdapter.getAttrList(element);
           if (elementAttrs.length === neAttrsLength) {
-            candidates.push({ idx: i2, attrs: elementAttrs });
+            candidates.push({ idx: i, attrs: elementAttrs });
           }
         }
       }
@@ -12224,8 +12224,8 @@ var source = (() => {
         return;
       const neAttrsMap = new Map(neAttrs.map((neAttr) => [neAttr.name, neAttr.value]));
       let validCandidates = 0;
-      for (let i2 = 0; i2 < candidates.length; i2++) {
-        const candidate = candidates[i2];
+      for (let i = 0; i < candidates.length; i++) {
+        const candidate = candidates[i];
         if (candidate.attrs.every((cAttr) => neAttrsMap.get(cAttr.name) === cAttr.value)) {
           validCandidates += 1;
           if (validCandidates >= NOAH_ARK_CAPACITY) {
@@ -12737,28 +12737,28 @@ var source = (() => {
     return isFontWithAttrs || EXITS_FOREIGN_CONTENT.has(tn);
   }
   function adjustTokenMathMLAttrs(token) {
-    for (let i2 = 0; i2 < token.attrs.length; i2++) {
-      if (token.attrs[i2].name === DEFINITION_URL_ATTR) {
-        token.attrs[i2].name = ADJUSTED_DEFINITION_URL_ATTR;
+    for (let i = 0; i < token.attrs.length; i++) {
+      if (token.attrs[i].name === DEFINITION_URL_ATTR) {
+        token.attrs[i].name = ADJUSTED_DEFINITION_URL_ATTR;
         break;
       }
     }
   }
   function adjustTokenSVGAttrs(token) {
-    for (let i2 = 0; i2 < token.attrs.length; i2++) {
-      const adjustedAttrName = SVG_ATTRS_ADJUSTMENT_MAP.get(token.attrs[i2].name);
+    for (let i = 0; i < token.attrs.length; i++) {
+      const adjustedAttrName = SVG_ATTRS_ADJUSTMENT_MAP.get(token.attrs[i].name);
       if (adjustedAttrName != null) {
-        token.attrs[i2].name = adjustedAttrName;
+        token.attrs[i].name = adjustedAttrName;
       }
     }
   }
   function adjustTokenXMLAttrs(token) {
-    for (let i2 = 0; i2 < token.attrs.length; i2++) {
-      const adjustedAttrEntry = XML_ATTRS_ADJUSTMENT_MAP.get(token.attrs[i2].name);
+    for (let i = 0; i < token.attrs.length; i++) {
+      const adjustedAttrEntry = XML_ATTRS_ADJUSTMENT_MAP.get(token.attrs[i].name);
       if (adjustedAttrEntry) {
-        token.attrs[i2].prefix = adjustedAttrEntry.prefix;
-        token.attrs[i2].name = adjustedAttrEntry.name;
-        token.attrs[i2].namespace = adjustedAttrEntry.namespace;
+        token.attrs[i].prefix = adjustedAttrEntry.prefix;
+        token.attrs[i].name = adjustedAttrEntry.name;
+        token.attrs[i].namespace = adjustedAttrEntry.namespace;
       }
     }
   }
@@ -12774,9 +12774,9 @@ var source = (() => {
   }
   function isHtmlIntegrationPoint(tn, ns, attrs) {
     if (ns === NS.MATHML && tn === TAG_ID.ANNOTATION_XML) {
-      for (let i2 = 0; i2 < attrs.length; i2++) {
-        if (attrs[i2].name === ATTRS.ENCODING) {
-          const value = attrs[i2].value.toLowerCase();
+      for (let i = 0; i < attrs.length; i++) {
+        if (attrs[i].name === ATTRS.ENCODING) {
+          const value = attrs[i].value.toLowerCase();
           return value === MIME_TYPES.TEXT_HTML || value === MIME_TYPES.APPLICATION_XML;
         }
       }
@@ -13210,8 +13210,8 @@ var source = (() => {
       if (listLength) {
         const endIndex = this.activeFormattingElements.entries.findIndex((entry) => entry.type === EntryType.Marker || this.openElements.contains(entry.element));
         const unopenIdx = endIndex === -1 ? listLength - 1 : endIndex - 1;
-        for (let i2 = unopenIdx; i2 >= 0; i2--) {
-          const entry = this.activeFormattingElements.entries[i2];
+        for (let i = unopenIdx; i >= 0; i--) {
+          const entry = this.activeFormattingElements.entries[i];
           this._insertElement(entry.token, this.treeAdapter.getNamespaceURI(entry.element));
           entry.element = this.openElements.current;
         }
@@ -13233,8 +13233,8 @@ var source = (() => {
     //Insertion modes
     /** @protected */
     _resetInsertionMode() {
-      for (let i2 = this.openElements.stackTop; i2 >= 0; i2--) {
-        switch (i2 === 0 && this.fragmentContext ? this.fragmentContextID : this.openElements.tagIDs[i2]) {
+      for (let i = this.openElements.stackTop; i >= 0; i--) {
+        switch (i === 0 && this.fragmentContext ? this.fragmentContextID : this.openElements.tagIDs[i]) {
           case TAG_ID.TR: {
             this.insertionMode = InsertionMode.IN_ROW;
             return;
@@ -13266,7 +13266,7 @@ var source = (() => {
             return;
           }
           case TAG_ID.SELECT: {
-            this._resetInsertionModeForSelect(i2);
+            this._resetInsertionModeForSelect(i);
             return;
           }
           case TAG_ID.TEMPLATE: {
@@ -13279,14 +13279,14 @@ var source = (() => {
           }
           case TAG_ID.TD:
           case TAG_ID.TH: {
-            if (i2 > 0) {
+            if (i > 0) {
               this.insertionMode = InsertionMode.IN_CELL;
               return;
             }
             break;
           }
           case TAG_ID.HEAD: {
-            if (i2 > 0) {
+            if (i > 0) {
               this.insertionMode = InsertionMode.IN_HEAD;
               return;
             }
@@ -13299,8 +13299,8 @@ var source = (() => {
     /** @protected */
     _resetInsertionModeForSelect(selectIdx) {
       if (selectIdx > 0) {
-        for (let i2 = selectIdx - 1; i2 > 0; i2--) {
-          const tn = this.openElements.tagIDs[i2];
+        for (let i = selectIdx - 1; i > 0; i--) {
+          const tn = this.openElements.tagIDs[i];
           if (tn === TAG_ID.TEMPLATE) {
             break;
           } else if (tn === TAG_ID.TABLE) {
@@ -13322,9 +13322,9 @@ var source = (() => {
     }
     /** @protected */
     _findFosterParentingLocation() {
-      for (let i2 = this.openElements.stackTop; i2 >= 0; i2--) {
-        const openElement = this.openElements.items[i2];
-        switch (this.openElements.tagIDs[i2]) {
+      for (let i = this.openElements.stackTop; i >= 0; i--) {
+        const openElement = this.openElements.items[i];
+        switch (this.openElements.tagIDs[i]) {
           case TAG_ID.TEMPLATE: {
             if (this.treeAdapter.getNamespaceURI(openElement) === NS.HTML) {
               return { parent: this.treeAdapter.getTemplateContent(openElement), beforeElement: null };
@@ -13336,7 +13336,7 @@ var source = (() => {
             if (parent2) {
               return { parent: parent2, beforeElement: openElement };
             }
-            return { parent: this.openElements.items[i2 - 1], beforeElement: null };
+            return { parent: this.openElements.items[i - 1], beforeElement: null };
           }
           default:
         }
@@ -13926,10 +13926,10 @@ var source = (() => {
   function aaInnerLoop(p, furthestBlock, formattingElement) {
     let lastElement = furthestBlock;
     let nextElement = p.openElements.getCommonAncestor(furthestBlock);
-    for (let i2 = 0, element = nextElement; element !== formattingElement; i2++, element = nextElement) {
+    for (let i = 0, element = nextElement; element !== formattingElement; i++, element = nextElement) {
       nextElement = p.openElements.getCommonAncestor(element);
       const elementEntry = p.activeFormattingElements.getElementEntry(element);
-      const counterOverflow = elementEntry && i2 >= AA_INNER_LOOP_ITER;
+      const counterOverflow = elementEntry && i >= AA_INNER_LOOP_ITER;
       const shouldRemoveFromOpenElements = !elementEntry || counterOverflow;
       if (shouldRemoveFromOpenElements) {
         if (counterOverflow) {
@@ -13980,7 +13980,7 @@ var source = (() => {
     p.openElements.insertAfter(furthestBlock, newElement, token.tagID);
   }
   function callAdoptionAgency(p, token) {
-    for (let i2 = 0; i2 < AA_OUTER_LOOP_ITER; i2++) {
+    for (let i = 0; i < AA_OUTER_LOOP_ITER; i++) {
       const formattingElementEntry = aaObtainFormattingElementEntry(p, token);
       if (!formattingElementEntry) {
         break;
@@ -14011,8 +14011,8 @@ var source = (() => {
     p.stopped = true;
     if (token.location) {
       const target = p.fragmentContext ? 0 : 2;
-      for (let i2 = p.openElements.stackTop; i2 >= target; i2--) {
-        p._setEndLocation(p.openElements.items[i2], token);
+      for (let i = p.openElements.stackTop; i >= target; i--) {
+        p._setEndLocation(p.openElements.items[i], token);
       }
       if (!p.fragmentContext && p.openElements.stackTop >= 0) {
         const htmlElement = p.openElements.items[0];
@@ -14399,14 +14399,14 @@ var source = (() => {
   function listItemStartTagInBody(p, token) {
     p.framesetOk = false;
     const tn = token.tagID;
-    for (let i2 = p.openElements.stackTop; i2 >= 0; i2--) {
-      const elementId = p.openElements.tagIDs[i2];
+    for (let i = p.openElements.stackTop; i >= 0; i--) {
+      const elementId = p.openElements.tagIDs[i];
       if (tn === TAG_ID.LI && elementId === TAG_ID.LI || (tn === TAG_ID.DD || tn === TAG_ID.DT) && (elementId === TAG_ID.DD || elementId === TAG_ID.DT)) {
         p.openElements.generateImpliedEndTagsWithExclusion(elementId);
         p.openElements.popUntilTagNamePopped(elementId);
         break;
       }
-      if (elementId !== TAG_ID.ADDRESS && elementId !== TAG_ID.DIV && elementId !== TAG_ID.P && p._isSpecialElement(p.openElements.items[i2], elementId)) {
+      if (elementId !== TAG_ID.ADDRESS && elementId !== TAG_ID.DIV && elementId !== TAG_ID.P && p._isSpecialElement(p.openElements.items[i], elementId)) {
         break;
       }
     }
@@ -14876,13 +14876,13 @@ var source = (() => {
   function genericEndTagInBody(p, token) {
     const tn = token.tagName;
     const tid = token.tagID;
-    for (let i2 = p.openElements.stackTop; i2 > 0; i2--) {
-      const element = p.openElements.items[i2];
-      const elementId = p.openElements.tagIDs[i2];
+    for (let i = p.openElements.stackTop; i > 0; i--) {
+      const element = p.openElements.items[i];
+      const elementId = p.openElements.tagIDs[i];
       if (tid === elementId && (tid !== TAG_ID.UNKNOWN || p.treeAdapter.getTagName(element) === tn)) {
         p.openElements.generateImpliedEndTagsWithExclusion(tid);
-        if (p.openElements.stackTop >= i2)
-          p.openElements.shortenToLength(i2);
+        if (p.openElements.stackTop >= i)
+          p.openElements.shortenToLength(i);
         break;
       }
       if (p._isSpecialElement(element, elementId)) {
@@ -15177,14 +15177,14 @@ var source = (() => {
     p.hasNonWhitespacePendingCharacterToken = true;
   }
   function tokenInTableText(p, token) {
-    let i2 = 0;
+    let i = 0;
     if (p.hasNonWhitespacePendingCharacterToken) {
-      for (; i2 < p.pendingCharacterTokens.length; i2++) {
-        tokenInTable(p, p.pendingCharacterTokens[i2]);
+      for (; i < p.pendingCharacterTokens.length; i++) {
+        tokenInTable(p, p.pendingCharacterTokens[i]);
       }
     } else {
-      for (; i2 < p.pendingCharacterTokens.length; i2++) {
-        p._insertCharacters(p.pendingCharacterTokens[i2]);
+      for (; i < p.pendingCharacterTokens.length; i++) {
+        p._insertCharacters(p.pendingCharacterTokens[i]);
       }
     }
     p.insertionMode = p.originalInsertionMode;
@@ -15797,8 +15797,8 @@ var source = (() => {
       p._endTagOutsideForeignContent(token);
       return;
     }
-    for (let i2 = p.openElements.stackTop; i2 > 0; i2--) {
-      const element = p.openElements.items[i2];
+    for (let i = p.openElements.stackTop; i > 0; i--) {
+      const element = p.openElements.items[i];
       if (p.treeAdapter.getNamespaceURI(element) === NS.HTML) {
         p._endTagOutsideForeignContent(token);
         break;
@@ -15806,7 +15806,7 @@ var source = (() => {
       const tagName = p.treeAdapter.getTagName(element);
       if (tagName.toLowerCase() === token.tagName) {
         token.tagName = tagName;
-        p.openElements.shortenToLength(i2);
+        p.openElements.shortenToLength(i);
         break;
       }
     }
@@ -16010,11 +16010,11 @@ var source = (() => {
       const attribs = /* @__PURE__ */ Object.create(null);
       const attribsNamespace = /* @__PURE__ */ Object.create(null);
       const attribsPrefix = /* @__PURE__ */ Object.create(null);
-      for (let i2 = 0; i2 < attrs.length; i2++) {
-        const attrName = attrs[i2].name;
-        attribs[attrName] = attrs[i2].value;
-        attribsNamespace[attrName] = attrs[i2].namespace;
-        attribsPrefix[attrName] = attrs[i2].prefix;
+      for (let i = 0; i < attrs.length; i++) {
+        const attrName = attrs[i].name;
+        attribs[attrName] = attrs[i].value;
+        attribsNamespace[attrName] = attrs[i].namespace;
+        attribsPrefix[attrName] = attrs[i].prefix;
       }
       const node = new Element(tagName, attribs, []);
       node.namespace = namespaceURI;
@@ -16108,12 +16108,12 @@ var source = (() => {
       }
     },
     adoptAttributes(recipient, attrs) {
-      for (let i2 = 0; i2 < attrs.length; i2++) {
-        const attrName = attrs[i2].name;
+      for (let i = 0; i < attrs.length; i++) {
+        const attrName = attrs[i].name;
         if (recipient.attribs[attrName] === void 0) {
-          recipient.attribs[attrName] = attrs[i2].value;
-          recipient["x-attribsNamespace"][attrName] = attrs[i2].namespace;
-          recipient["x-attribsPrefix"][attrName] = attrs[i2].prefix;
+          recipient.attribs[attrName] = attrs[i].value;
+          recipient["x-attribsNamespace"][attrName] = attrs[i].namespace;
+          recipient["x-attribsPrefix"][attrName] = attrs[i].prefix;
         }
       }
     },
@@ -17496,18 +17496,18 @@ var source = (() => {
   // src/MangaFox/main.ts
   var DOMAIN_NAME = "https://fanfox.net";
   var MainInterceptor = class extends import_types2.PaperbackInterceptor {
-    async interceptRequest(request2) {
-      request2.headers = {
-        ...request2.headers ?? {},
+    async interceptRequest(request) {
+      request.headers = {
+        ...request.headers ?? {},
         ...{
           referer: `${DOMAIN_NAME}/`,
           "user-agent": await Application.getDefaultUserAgent()
         }
       };
-      request2.cookies = { name: "isAdult", value: "1", domain: "fanfox.net" };
-      return request2;
+      request.cookies = { name: "isAdult", value: "1", domain: "fanfox.net" };
+      return request;
     }
-    async interceptResponse(request2, response, data2) {
+    async interceptResponse(request, response, data2) {
       return data2;
     }
   };
@@ -17571,18 +17571,18 @@ var source = (() => {
     async getHotRelease(metadata) {
       const items = [];
       const collectedIds = metadata?.collectedIds ?? [];
-      const request2 = {
+      const request = {
         url: new URLBuilder(DOMAIN_NAME).build(),
         method: "GET"
       };
-      const $3 = await this.fetchCheerio(request2);
-      $3("div.manga-list-1 ul.manga-list-1-list li").each((_, element) => {
-        const unit = $3(element);
-        const mangaLink = $3('a[href^="/manga/"]', unit).first();
+      const $2 = await this.fetchCheerio(request);
+      $2("div.manga-list-1 ul.manga-list-1-list li").each((_, element) => {
+        const unit = $2(element);
+        const mangaLink = $2('a[href^="/manga/"]', unit).first();
         const mangaId = mangaLink.attr("href")?.split("/manga/")[1]?.replace(/\//g, "") || "";
-        const image = $3("img.manga-list-1-cover", unit).attr("src") ?? "";
+        const image = $2("img.manga-list-1-cover", unit).attr("src") ?? "";
         const title = mangaLink.attr("title")?.trim() ?? "";
-        const subtitle = $3("p.manga-list-1-item-subtitle", unit).text().trim();
+        const subtitle = $2("p.manga-list-1-item-subtitle", unit).text().trim();
         const safeId = decodeURIComponent(mangaId).replace(/[^\w@.]/g, "_").trim();
         if (safeId && title && image && !collectedIds.includes(safeId)) {
           collectedIds.push(safeId);
@@ -17612,18 +17612,18 @@ var source = (() => {
       } else {
         urlBuilder.addPath("?news");
       }
-      const request2 = {
+      const request = {
         url: urlBuilder.build(),
         method: "GET"
       };
-      const $3 = await this.fetchCheerio(request2);
-      $3("div.manga-list-1 ul.manga-list-1-list li").each((_, element) => {
-        const unit = $3(element);
-        const mangaLink = $3('a[href^="/manga/"]', unit).first();
+      const $2 = await this.fetchCheerio(request);
+      $2("div.manga-list-1 ul.manga-list-1-list li").each((_, element) => {
+        const unit = $2(element);
+        const mangaLink = $2('a[href^="/manga/"]', unit).first();
         const mangaId = mangaLink.attr("href")?.split("/manga/")[1]?.replace(/\//g, "") || "";
-        const image = $3("img.manga-list-1-cover", unit).attr("src") ?? "";
+        const image = $2("img.manga-list-1-cover", unit).attr("src") ?? "";
         const title = mangaLink.attr("title")?.trim() ?? "";
-        const subtitle = $3("ul.manga-list-4-item-part > li", unit).text().trim();
+        const subtitle = $2("ul.manga-list-4-item-part > li", unit).text().trim();
         const safeId = decodeURIComponent(mangaId).replace(/[^\w@.]/g, "_").trim();
         if (safeId && title && image && !collectedIds.includes(safeId)) {
           collectedIds.push(safeId);
@@ -17639,8 +17639,8 @@ var source = (() => {
         }
       });
       let nextPage;
-      const nextPageLink = $3(".pager-list-left a").filter(function() {
-        return $3(this).text() === ">";
+      const nextPageLink = $2(".pager-list-left a").filter(function() {
+        return $2(this).text() === ">";
       });
       if (nextPageLink.length > 0) {
         const nextPageHref = nextPageLink.attr("href");
@@ -17668,18 +17668,18 @@ var source = (() => {
       if (page > 1) {
         urlBuilder.addPath(`${page}.html`);
       }
-      const request2 = {
+      const request = {
         url: urlBuilder.build(),
         method: "GET"
       };
-      const $3 = await this.fetchCheerio(request2);
-      $3("div.manga-list-4 ul.manga-list-4-list li").each((_, element) => {
-        const unit = $3(element);
-        const mangaLink = $3("p.manga-list-4-item-title a", unit).first();
+      const $2 = await this.fetchCheerio(request);
+      $2("div.manga-list-4 ul.manga-list-4-list li").each((_, element) => {
+        const unit = $2(element);
+        const mangaLink = $2("p.manga-list-4-item-title a", unit).first();
         const mangaId = mangaLink.attr("href")?.split("/manga/")[1]?.replace(/\//g, "") || "";
-        const image = $3("img.manga-list-4-cover", unit).attr("src") ?? "";
+        const image = $2("img.manga-list-4-cover", unit).attr("src") ?? "";
         const title = mangaLink.attr("title")?.trim() ?? "";
-        const subtitle = $3("ul.manga-list-4-item-part > li", unit).first().text().trim();
+        const subtitle = $2("ul.manga-list-4-item-part > li", unit).first().text().trim();
         const safeId = decodeURIComponent(mangaId).replace(/[^\w@.]/g, "_").trim();
         if (safeId && title && image && !collectedIds.includes(safeId)) {
           collectedIds.push(safeId);
@@ -17695,8 +17695,8 @@ var source = (() => {
         }
       });
       let nextPage;
-      const nextPageLink = $3(".pager-list-left a").filter(function() {
-        return $3(this).text() === ">";
+      const nextPageLink = $2(".pager-list-left a").filter(function() {
+        return $2(this).text() === ">";
       });
       if (nextPageLink.length > 0) {
         const nextPageHref = nextPageLink.attr("href");
@@ -17781,19 +17781,19 @@ var source = (() => {
         const url = urlBuilder.build();
         fixedUrl = url.replace("title=%22%22", "title=");
       }
-      const request2 = {
+      const request = {
         url: fixedUrl,
         method: "GET"
       };
-      const $3 = await this.fetchCheerio(request2);
+      const $2 = await this.fetchCheerio(request);
       const searchResults = [];
-      $3("div.manga-list-4 ul.manga-list-4-list li").each((_, element) => {
-        const unit = $3(element);
-        const mangaLink = $3("p.manga-list-4-item-title a", unit).first();
+      $2("div.manga-list-4 ul.manga-list-4-list li").each((_, element) => {
+        const unit = $2(element);
+        const mangaLink = $2("p.manga-list-4-item-title a", unit).first();
         const mangaId = mangaLink.attr("href")?.split("/manga/")[1]?.replace(/\//g, "") || "";
-        const image = $3("img.manga-list-4-cover", unit).attr("src") ?? "";
+        const image = $2("img.manga-list-4-cover", unit).attr("src") ?? "";
         const title = mangaLink.attr("title")?.trim() ?? "";
-        const subtitle = $3("ul.manga-list-4-item-part > li", unit).first().text().trim();
+        const subtitle = $2("ul.manga-list-4-item-part > li", unit).first().text().trim();
         const safeId = decodeURIComponent(mangaId).replace(/[^\w@.]/g, "_").trim();
         if (safeId && title && image && !collectedIds.includes(safeId)) {
           collectedIds.push(safeId);
@@ -17806,8 +17806,8 @@ var source = (() => {
         }
       });
       let nextPage;
-      const nextPageLink = $3(".pager-list-left a").filter(function() {
-        return $3(this).text() === ">";
+      const nextPageLink = $2(".pager-list-left a").filter(function() {
+        return $2(this).text() === ">";
       });
       if (nextPageLink.length > 0) {
         const nextPageHref = nextPageLink.attr("href");
@@ -17829,21 +17829,21 @@ var source = (() => {
     }
     // Populates the title details
     async getMangaDetails(mangaId) {
-      const request2 = {
+      const request = {
         url: new URLBuilder(DOMAIN_NAME).addPath("manga").addPath(mangaId).build(),
         method: "GET"
       };
-      const $3 = await this.fetchCheerio(request2);
-      const section = $3(".detail-info");
-      const title = $3("span.detail-info-right-title-font", section).text().trim();
-      const rating = $3("span.item-score", section).text().trim().replace(",", ".");
-      const author = $3("p.detail-info-right-say a", section).text().trim();
-      const image = $3(".detail-info-cover-img", $3(".detail-info-cover")).attr("src") ?? "";
-      const description = $3("p.fullcontent").text().trim();
+      const $2 = await this.fetchCheerio(request);
+      const section = $2(".detail-info");
+      const title = $2("span.detail-info-right-title-font", section).text().trim();
+      const rating = $2("span.item-score", section).text().trim().replace(",", ".");
+      const author = $2("p.detail-info-right-say a", section).text().trim();
+      const image = $2(".detail-info-cover-img", $2(".detail-info-cover")).attr("src") ?? "";
+      const description = $2("p.fullcontent").text().trim();
       const arrayTags = [];
-      for (const tag of $3("a", ".detail-info-right-tag-list").toArray()) {
-        const id = $3(tag).attr("href")?.split("/directory/")[1]?.replace(/\//g, "");
-        const label = $3(tag).text().trim();
+      for (const tag of $2("a", ".detail-info-right-tag-list").toArray()) {
+        const id = $2(tag).attr("href")?.split("/directory/")[1]?.replace(/\//g, "");
+        const label = $2(tag).text().trim();
         if (!id || !label) continue;
         arrayTags.push({ id, title: label });
       }
@@ -17858,7 +17858,7 @@ var source = (() => {
           }))
         });
       }
-      const rawStatus = $3(".detail-info-right-title-tip", section).text().trim();
+      const rawStatus = $2(".detail-info-right-title-tip", section).text().trim();
       let status = "ONGOING";
       switch (rawStatus.toUpperCase()) {
         case "ONGOING":
@@ -17905,15 +17905,15 @@ var source = (() => {
     }
     // Populates the chapter list
     async getChapters(sourceManga) {
-      const request2 = {
+      const request = {
         url: new URLBuilder(DOMAIN_NAME).addPath("manga").addPath(sourceManga.mangaId).build(),
         method: "GET"
       };
-      const $3 = await this.fetchCheerio(request2);
+      const $2 = await this.fetchCheerio(request);
       const chapters = [];
-      for (const chapter2 of $3("div#chapterlist ul li").children("a").toArray()) {
-        const date = parseDate($3("p.title2", chapter2).html() ?? "");
-        const chapterIdRaw = $3(chapter2).attr("href")?.trim();
+      for (const chapter of $2("div#chapterlist ul li").children("a").toArray()) {
+        const date = parseDate($2("p.title2", chapter).html() ?? "");
+        const chapterIdRaw = $2(chapter).attr("href")?.trim();
         const chapterIdRegex = chapterIdRaw?.match(
           /\/manga\/[a-zA-Z0-9_]*\/(.*)\//
         );
@@ -17943,13 +17943,13 @@ var source = (() => {
         method: "GET"
       };
       try {
-        const $ = await this.fetchCheerio(request);
+        const $2 = await this.fetchCheerio(request);
         const pages = [];
-        const isWebtoon = $("script[src*=chapter_bar]").length > 0;
+        const isWebtoon = $2("script[src*=chapter_bar]").length > 0;
         if (isWebtoon) {
-          const script = $("script:contains(function(p,a,c,k,e,d))").html()?.replace("eval", "");
+          const script = $2("script:contains(function(p,a,c,k,e,d))").html()?.replace("eval", "");
           if (script) {
-            const deobfuscatedScript = eval(script).toString();
+            const deobfuscatedScript = (0, eval)(script).toString();
             const urlsMatch = deobfuscatedScript.match(/newImgs=\['(.+?)'\]/);
             if (urlsMatch && urlsMatch[1]) {
               const urls = urlsMatch[1].split("','");
@@ -17959,30 +17959,30 @@ var source = (() => {
             }
           }
         } else {
-          const script = $("script:contains(function(p,a,c,k,e,d))").html()?.replace("eval", "");
+          const script = $2("script:contains(function(p,a,c,k,e,d))").html()?.replace("eval", "");
           if (script) {
-            const deobfuscatedScript = eval(script).toString();
+            const deobfuscatedScript = (0, eval)(script).toString();
             const secretKeyStart = deobfuscatedScript.indexOf("'");
             const secretKeyEnd = deobfuscatedScript.indexOf(";");
             const secretKeyResultScript = deobfuscatedScript.substring(secretKeyStart, secretKeyEnd).trim();
             let secretKey = "";
             try {
-              secretKey = eval(secretKeyResultScript).toString();
+              secretKey = (0, eval)(secretKeyResultScript).toString();
             } catch (e) {
               console.error("Error extracting secret key:", e);
             }
-            const chapterIdStartLoc = $.html().indexOf("chapterid");
+            const chapterIdStartLoc = $2.html().indexOf("chapterid");
             if (chapterIdStartLoc > -1) {
-              const numericChapterId = $.html().substring(
+              const numericChapterId = $2.html().substring(
                 chapterIdStartLoc + 11,
-                $.html().indexOf(";", chapterIdStartLoc)
+                $2.html().indexOf(";", chapterIdStartLoc)
               ).trim();
-              const pagesLinksElements = $(
+              const pagesLinksElements = $2(
                 "a",
-                $(".pager-list-left > span").first()
+                $2(".pager-list-left > span").first()
               );
               const pagesNumber = Number(
-                $(
+                $2(
                   pagesLinksElements[pagesLinksElements.length - 2]
                 )?.attr("data-page")
               ) || 0;
@@ -18025,7 +18025,7 @@ var source = (() => {
                   }
                   if (responseString) {
                     try {
-                      const deobfuscatedPageScript = eval(
+                      const deobfuscatedPageScript = (0, eval)(
                         responseString.replace(
                           "eval",
                           ""
@@ -18068,14 +18068,14 @@ var source = (() => {
           }
         }
         if (pages.length === 0) {
-          $("img.img-fluid").each((_, element) => {
-            const src = $(element).attr("src");
+          $2("img.img-fluid").each((_, element) => {
+            const src = $2(element).attr("src");
             if (src && src.length > 0) {
               pages.push(src);
             }
           });
-          $("script:not([src])").each((_, element) => {
-            const scriptText = $(element).html() || "";
+          $2("script:not([src])").each((_, element) => {
+            const scriptText = $2(element).html() || "";
             if (scriptText.includes('"images"') || scriptText.includes('"pages"')) {
               try {
                 const match = scriptText.match(
@@ -18121,8 +18121,8 @@ var source = (() => {
         );
       }
     }
-    async fetchCheerio(request2) {
-      const [response, data2] = await Application.scheduleRequest(request2);
+    async fetchCheerio(request) {
+      const [response, data2] = await Application.scheduleRequest(request);
       this.checkCloudflareStatus(response.status);
       return load(Application.arrayBufferToUTF8String(data2));
     }

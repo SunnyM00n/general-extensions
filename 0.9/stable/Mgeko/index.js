@@ -17413,7 +17413,9 @@ var source = (() => {
   init_buffer();
   var import_types2 = __toESM(require_lib(), 1);
   var parseMangaDetails = ($2, mangaId, sourceUrl) => {
-    const primaryTitle = $2(".novel-title").text().trim();
+    const primaryTitle = Application.decodeHTMLEntities(
+      $2(".novel-title").text().trim()
+    );
     const secondaryTitles = [];
     secondaryTitles.push(
       Application.decodeHTMLEntities(
@@ -17530,9 +17532,14 @@ var source = (() => {
       const title = $2("img", obj).first().attr("alt") ?? "";
       const id = $2("a", obj).attr("href")?.replace(/\/$/, "").split("/").pop() ?? "";
       const getChapter = $2("div.novel-stats > strong", obj).text().trim();
-      const chapNumRegex = /(\d+\.?\d?)+/.exec(getChapter);
+      const chapNumRegex = /(\d+)(?:[-.]\d+)?/.exec(getChapter);
       let chapNum = 0;
-      if (chapNumRegex?.[1]) chapNum = Number(chapNumRegex[1]);
+      if (chapNumRegex?.[1]) {
+        let chapRegex = chapNumRegex[1];
+        if (chapRegex.includes("-"))
+          chapRegex = chapRegex.replace("-", ".");
+        chapNum = Number(chapRegex);
+      }
       const subtitle = chapNum ? `Chapter ${chapNum.toString()}` : "Chapter N/A";
       if (!id || !title || collectedIds.includes(id)) continue;
       manga.push({
@@ -17567,10 +17574,15 @@ var source = (() => {
       const title = $2("img", obj).first().attr("alt") ?? "";
       const id = $2("a", obj).attr("href")?.replace(/\/$/, "").split("/").pop() ?? "";
       const getChapter = $2("div.novel-stats > strong", obj).text().trim();
-      const chapNumRegex = /(\d+\.?\d?)+/.exec(getChapter);
+      const chapNumRegex = /(\d+)(?:[-.]\d+)?/.exec(getChapter);
       let chapNum = 0;
-      if (chapNumRegex?.[1]) chapNum = Number(chapNumRegex[1]);
-      const subtitle = chapNum ? `Chapter ' ${chapNum.toString()}` : "Chapter N/A";
+      if (chapNumRegex?.[1]) {
+        let chapRegex = chapNumRegex[1];
+        if (chapRegex.includes("-"))
+          chapRegex = chapRegex.replace("-", ".");
+        chapNum = Number(chapRegex);
+      }
+      const subtitle = chapNum ? `Chapter ${chapNum.toString()}` : "Chapter N/A";
       if (!id || !title) continue;
       mangas.push({
         mangaId: id,
@@ -17650,11 +17662,11 @@ var source = (() => {
     async getDiscoverSectionItems(section, metadata) {
       switch (section.id) {
         case "most_viewed":
-          return this.getMostViewedSectionItems(metadata);
+          return this.getFilteredSectionItems("Views", metadata);
         case "new":
-          return this.getNewSectionItems(metadata);
+          return this.getFilteredSectionItems("New", metadata);
         case "latest_updates":
-          return this.getLatestUpdatesSectionItems(metadata);
+          return this.getFilteredSectionItems("Updated", metadata);
         case "genres":
           return this.getGenreSectionItems();
         default:
@@ -17712,17 +17724,17 @@ var source = (() => {
     async getSearchResults(query, metadata) {
       const page = metadata?.page ?? 1;
       let request;
-      if (query.title) {
+      if (query.title?.trim()) {
         request = {
-          url: new URLBuilder(MGEKO_DOMAIN).addPath("search").addQuery("search", encodeURI(query.title)).build(),
+          url: new URLBuilder(MGEKO_DOMAIN).addPath("search").addQuery("search", encodeURI(query.title.trim())).build(),
           method: "GET"
         };
       } else {
-        const getFilterValue = (id) => query.filters.find((filter4) => filter4.id === id)?.value;
-        const genres = getFilterValue("genres");
+        const getFilterValue = (id) => query.filters?.find((filter4) => filter4.id === id)?.value;
+        const genres = getFilterValue("genres") ?? {};
         const genreIncluded = Object.entries(genres).filter(([, value]) => value === "included").map(([key]) => key).join(",");
         const genreExcluded = Object.entries(genres).filter(([, value]) => value === "excluded").map(([key]) => key).join(",");
-        const sortBy = getFilterValue("sortBy");
+        const sortBy = getFilterValue("sortBy") ?? "Views";
         request = {
           url: new URLBuilder(MGEKO_DOMAIN).addPath("browse-comics").addQuery("sort_by", sortBy).addQuery("genre_included", genreIncluded).addQuery("genre_excluded", genreExcluded).addQuery("results", page).build(),
           method: "GET"
@@ -17731,11 +17743,10 @@ var source = (() => {
       const $2 = await this.fetchCheerio(request);
       const manga = parseSearch($2, MGEKO_DOMAIN);
       metadata = !isLastPage($2) ? { page: page + 1 } : void 0;
-      const pagedResults = {
+      return {
         items: manga,
         metadata
       };
-      return pagedResults;
     }
     async getSearchFilters() {
       const filters2 = [];
@@ -17766,53 +17777,20 @@ var source = (() => {
       });
       return filters2;
     }
-    async getMostViewedSectionItems(metadata) {
+    async getFilteredSectionItems(filter4, metadata) {
       if (metadata?.completed) return import_types3.EndOfPageResults;
       const page = metadata?.page ?? 1;
       const request = {
-        url: new URLBuilder(MGEKO_DOMAIN).addPath("browse-comics").addQuery("results", page).addQuery("filter", "Views").build(),
+        url: new URLBuilder(MGEKO_DOMAIN).addPath("browse-comics").addQuery("results", page).addQuery("filter", filter4).build(),
         method: "GET"
       };
       const $2 = await this.fetchCheerio(request);
       const manga = parseViewMore($2);
       metadata = !isLastPage($2) ? { page: page + 1 } : void 0;
-      const pagedResults = {
+      return {
         items: manga,
         metadata
       };
-      return pagedResults;
-    }
-    async getNewSectionItems(metadata) {
-      if (metadata?.completed) return import_types3.EndOfPageResults;
-      const page = metadata?.page ?? 1;
-      const request = {
-        url: new URLBuilder(MGEKO_DOMAIN).addPath("browse-comics").addQuery("results", page).addQuery("filter", "New").build(),
-        method: "GET"
-      };
-      const $2 = await this.fetchCheerio(request);
-      const manga = parseViewMore($2);
-      metadata = !isLastPage($2) ? { page: page + 1 } : void 0;
-      const pagedResults = {
-        items: manga,
-        metadata
-      };
-      return pagedResults;
-    }
-    async getLatestUpdatesSectionItems(metadata) {
-      if (metadata?.completed) return import_types3.EndOfPageResults;
-      const page = metadata?.page ?? 1;
-      const request = {
-        url: new URLBuilder(MGEKO_DOMAIN).addPath("browse-comics").addQuery("results", page).addQuery("filter", "Updated").build(),
-        method: "GET"
-      };
-      const $2 = await this.fetchCheerio(request);
-      const manga = parseViewMore($2);
-      metadata = !isLastPage($2) ? { page: page + 1 } : void 0;
-      const pagedResults = {
-        items: manga,
-        metadata
-      };
-      return pagedResults;
     }
     async getGenreSectionItems() {
       const genres = (await this.getGenreTags())[0];
