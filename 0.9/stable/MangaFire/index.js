@@ -1828,7 +1828,7 @@ var source = (() => {
       init_buffer();
       Object.defineProperty(exports, "__esModule", { value: true });
       exports.Form = void 0;
-      var Form = class {
+      var Form3 = class {
         reloadForm() {
           const formId = this["__underlying_formId"];
           if (!formId)
@@ -1841,7 +1841,7 @@ var source = (() => {
           return false;
         }
       };
-      exports.Form = Form;
+      exports.Form = Form3;
     }
   });
 
@@ -1851,17 +1851,17 @@ var source = (() => {
       "use strict";
       init_buffer();
       Object.defineProperty(exports, "__esModule", { value: true });
-      exports.LabelRow = LabelRow;
+      exports.LabelRow = LabelRow2;
       exports.InputRow = InputRow;
       exports.StepperRow = StepperRow;
       exports.ToggleRow = ToggleRow;
-      exports.SelectRow = SelectRow;
+      exports.SelectRow = SelectRow2;
       exports.ButtonRow = ButtonRow;
       exports.WebViewRow = WebViewRow;
-      exports.NavigationRow = NavigationRow;
+      exports.NavigationRow = NavigationRow2;
       exports.OAuthButtonRow = OAuthButtonRow;
       exports.DeferredItem = DeferredItem;
-      function LabelRow(id, props) {
+      function LabelRow2(id, props) {
         return { ...props, id, type: "labelRow", isHidden: props.isHidden ?? false };
       }
       function InputRow(id, props) {
@@ -1878,7 +1878,7 @@ var source = (() => {
       function ToggleRow(id, props) {
         return { ...props, id, type: "toggleRow", isHidden: props.isHidden ?? false };
       }
-      function SelectRow(id, props) {
+      function SelectRow2(id, props) {
         return { ...props, id, type: "selectRow", isHidden: props.isHidden ?? false };
       }
       function ButtonRow(id, props) {
@@ -1892,7 +1892,7 @@ var source = (() => {
           isHidden: props.isHidden ?? false
         };
       }
-      function NavigationRow(id, props) {
+      function NavigationRow2(id, props) {
         return {
           ...props,
           id,
@@ -1920,8 +1920,8 @@ var source = (() => {
       "use strict";
       init_buffer();
       Object.defineProperty(exports, "__esModule", { value: true });
-      exports.Section = Section;
-      function Section(params, items) {
+      exports.Section = Section2;
+      function Section2(params, items) {
         let info;
         if (typeof params === "string") {
           info = { id: params };
@@ -3072,7 +3072,7 @@ var source = (() => {
     MangaFireExtension: () => MangaFireExtension
   });
   init_buffer();
-  var import_types3 = __toESM(require_lib(), 1);
+  var import_types4 = __toESM(require_lib(), 1);
 
   // node_modules/cheerio/dist/browser/index.js
   init_buffer();
@@ -17426,11 +17426,120 @@ var source = (() => {
     }
   };
 
+  // src/MangaFire/MangaFireSettings.ts
+  init_buffer();
+  var import_types3 = __toESM(require_lib(), 1);
+  var MFLanguagesClass = class {
+    Languages = [
+      { name: "English", MDCode: "en", flagCode: "\u{1F1EC}\u{1F1E7}", default: true },
+      { name: "Fran\xE7ais", MDCode: "fr", flagCode: "\u{1F1EB}\u{1F1F7}" },
+      { name: "Espa\xF1ol", MDCode: "es", flagCode: "\u{1F1EA}\u{1F1F8}" },
+      { name: "Espa\xF1ol (Latinoam\xE9rica)", MDCode: "es-la", flagCode: "\u{1F1F2}\u{1F1FD}" },
+      { name: "Portugu\xEAs", MDCode: "pt", flagCode: "\u{1F1F5}\u{1F1F9}" },
+      { name: "Portugu\xEAs (Brasil)", MDCode: "pt-br", flagCode: "\u{1F1E7}\u{1F1F7}" },
+      { name: "\u65E5\u672C\u8A9E", MDCode: "ja", flagCode: "\u{1F1EF}\u{1F1F5}" }
+    ];
+    constructor() {
+      this.Languages = this.Languages.sort(
+        (a, b) => a.name > b.name ? 1 : -1
+      );
+    }
+    getCodeList() {
+      return this.Languages.map((language) => language.MDCode);
+    }
+    getName(code) {
+      return this.Languages.find((language) => language.MDCode === code)?.name ?? "Unknown";
+    }
+    getFlagCode(code) {
+      return this.Languages.find((language) => language.MDCode === code)?.flagCode ?? "\u{1F3F3}\uFE0F";
+    }
+    getDefault() {
+      return this.Languages.filter((language) => language.default).map(
+        (language) => language.MDCode
+      );
+    }
+  };
+  var MFLanguages = new MFLanguagesClass();
+  function getLanguages() {
+    return Application.getState("languages") ?? MFLanguages.getDefault();
+  }
+  function setLanguages(languages) {
+    Application.setState(languages, "languages");
+  }
+  var MangaFireSettingsForm = class extends import_types3.Form {
+    getSections() {
+      return [
+        (0, import_types3.Section)("mainSettings", [
+          (0, import_types3.LabelRow)("settingsLabel", {
+            title: "MangaFire Settings",
+            subtitle: "Configure your reading experience"
+          }),
+          (0, import_types3.NavigationRow)("contentSettings", {
+            title: "Content Settings",
+            subtitle: "Languages and display options",
+            form: new ContentSettingsForm()
+          })
+        ])
+      ];
+    }
+  };
+  var ContentSettingsForm = class extends import_types3.Form {
+    languagesState;
+    constructor() {
+      super();
+      const languages = getLanguages();
+      this.languagesState = {
+        value: languages,
+        updateValue: async (newValue) => {
+          this.languagesState.value = newValue;
+          setLanguages(newValue);
+        }
+      };
+    }
+    async updateValue(value) {
+      this.languagesState.value = value;
+      setLanguages(value);
+    }
+    getSections() {
+      return [
+        (0, import_types3.Section)("contentSettings", [
+          (0, import_types3.LabelRow)("contentSettingsLabel", {
+            title: "Content Settings",
+            subtitle: "Configure your reading experience"
+          }),
+          (0, import_types3.SelectRow)("languages", {
+            title: "Languages",
+            subtitle: (() => {
+              const selectedLangCodes = this.languagesState.value;
+              const selectedLangNames = selectedLangCodes.map(
+                (langCode) => `${MFLanguages.getFlagCode(langCode)} ${MFLanguages.getName(
+                  langCode
+                )}`
+              ).sort();
+              return selectedLangNames.join(", ");
+            })(),
+            value: this.languagesState.value,
+            options: MFLanguages.getCodeList().map((code) => ({
+              id: code,
+              title: `${MFLanguages.getFlagCode(code)} ${MFLanguages.getName(code)}`
+            })),
+            minItemCount: 1,
+            maxItemCount: MFLanguages.getCodeList().length,
+            onValueChange: Application.Selector(
+              this,
+              "updateValue"
+            )
+          })
+        ])
+      ];
+    }
+  };
+
   // src/MangaFire/main.ts
   var baseUrl = "https://mangafire.to";
   var MangaFireExtension = class {
     requestManager = new FireInterceptor("main");
-    globalRateLimiter = new import_types3.BasicRateLimiter("rateLimiter", {
+    globalRateLimiter = new import_types4.BasicRateLimiter("rateLimiter", {
       numberOfRequests: 10,
       bufferInterval: 1,
       ignoreImages: true
@@ -17444,24 +17553,37 @@ var source = (() => {
         {
           id: "popular_section",
           title: "Popular",
-          type: import_types3.DiscoverSectionType.featured
+          type: import_types4.DiscoverSectionType.featured
         },
         {
           id: "updated_section",
           title: "Recently Updated",
-          type: import_types3.DiscoverSectionType.chapterUpdates
+          type: import_types4.DiscoverSectionType.chapterUpdates
         },
         {
           id: "new_manga_section",
           title: "New Manga",
-          type: import_types3.DiscoverSectionType.simpleCarousel
+          type: import_types4.DiscoverSectionType.simpleCarousel
+        },
+        {
+          id: "languages_section",
+          title: "Languages",
+          type: import_types4.DiscoverSectionType.genres
+        },
+        {
+          id: "types_section",
+          title: "Types",
+          type: import_types4.DiscoverSectionType.genres
         },
         {
           id: "genres_section",
           title: "Genres",
-          type: import_types3.DiscoverSectionType.genres
+          type: import_types4.DiscoverSectionType.genres
         }
       ];
+    }
+    async getSettingsForm() {
+      return new MangaFireSettingsForm();
     }
     async getDiscoverSectionItems(section, metadata) {
       switch (section.id) {
@@ -17471,22 +17593,116 @@ var source = (() => {
           return this.getUpdatedSectionItems(section, metadata);
         case "new_manga_section":
           return this.getNewMangaSectionItems(section, metadata);
+        case "types_section":
+          return this.getTypesSection();
         case "genres_section":
           return this.getFilterSection();
+        case "languages_section":
+          return this.getLanguagesSection();
         default:
           return { items: [] };
       }
     }
+    async getSearchDetails() {
+      try {
+        const request = {
+          url: `${baseUrl}/filter`,
+          method: "GET"
+        };
+        const $2 = await this.fetchCheerio(request);
+        const types = [];
+        const genres = [];
+        const status = [];
+        const languages = [];
+        const years = [];
+        const lengths = [];
+        const sorts = [];
+        $2(
+          ".dropdown:has(button .value[data-placeholder='Type']) .dropdown-menu.noclose.c1 li"
+        ).each((_, element) => {
+          const id = $2(element).find("input").attr("value") ?? "";
+          const label = $2(element).find("label").text().trim();
+          if (label) {
+            types.push({ id, label });
+          }
+        });
+        $2(".genres li").each((_, element) => {
+          const id = $2(element).find("input").attr("value") ?? "";
+          const label = $2(element).find("label").text().trim();
+          if (label && id) {
+            genres.push({ id, label });
+          }
+        });
+        $2(
+          ".dropdown:has(button .value[data-placeholder='Status']) .dropdown-menu.noclose.c1 li"
+        ).each((_, element) => {
+          const id = $2(element).find("input").attr("value") ?? "";
+          const label = $2(element).find("label").text().trim();
+          if (label && id) {
+            status.push({ id, label });
+          }
+        });
+        $2(
+          ".dropdown:has(button .value[data-placeholder='Language']) .dropdown-menu.noclose.c1 li"
+        ).each((_, element) => {
+          const id = $2(element).find("input").attr("value") ?? "";
+          const label = $2(element).find("label").text().trim();
+          if (label && id) {
+            languages.push({ id, label });
+          }
+        });
+        $2(
+          ".dropdown:has(button .value[data-placeholder='Year']) .dropdown-menu.noclose.md.c3 li"
+        ).each((_, element) => {
+          const id = $2(element).find("input").attr("value") ?? "";
+          const label = $2(element).find("label").text().trim();
+          if (label && id) {
+            years.push({ id, label });
+          }
+        });
+        $2(
+          ".dropdown:has(button .value[data-placeholder='Length']) .dropdown-menu.noclose.c1 li"
+        ).each((_, element) => {
+          const id = $2(element).find("input").attr("value") ?? "";
+          const label = $2(element).find("label").text().trim();
+          if (label && id) {
+            lengths.push({ id, label });
+          }
+        });
+        $2(
+          ".dropdown:has(button .value[data-placeholder='Sort']) .dropdown-menu.noclose.c1 li"
+        ).each((_, element) => {
+          const id = $2(element).find("input").attr("value") ?? "";
+          const label = $2(element).find("label").text().trim();
+          if (label && id) {
+            sorts.push({ id, label });
+          }
+        });
+        return {
+          types,
+          genres,
+          status,
+          languages,
+          years,
+          lengths,
+          sorts
+        };
+      } catch (error) {
+        console.error("Error fetching search details:", error);
+      }
+    }
     async getSearchFilters() {
       const filters2 = [];
+      const searchDetails = await this.getSearchDetails();
       filters2.push({
         id: "type",
         type: "dropdown",
         options: [
           { id: "all", value: "All" },
-          { id: "manhua", value: "Manhua" },
-          { id: "manhwa", value: "Manhwa" },
-          { id: "manga", value: "Manga" }
+          ...searchDetails?.types?.map((t) => ({
+            id: t.id,
+            value: t.label
+          })) || []
         ],
         value: "all",
         title: "Type Filter"
@@ -17494,49 +17710,10 @@ var source = (() => {
       filters2.push({
         id: "genres",
         type: "multiselect",
-        options: [
-          { id: "1", value: "Action" },
-          { id: "78", value: "Adventure" },
-          { id: "3", value: "Avant Garde" },
-          { id: "4", value: "Boys Love" },
-          { id: "5", value: "Comedy" },
-          { id: "77", value: "Demons" },
-          { id: "6", value: "Drama" },
-          { id: "7", value: "Ecchi" },
-          { id: "79", value: "Fantasy" },
-          { id: "9", value: "Girls Love" },
-          { id: "10", value: "Gourmet" },
-          { id: "11", value: "Harem" },
-          { id: "530", value: "Horror" },
-          { id: "13", value: "Isekai" },
-          { id: "531", value: "Iyashikei" },
-          { id: "15", value: "Josei" },
-          { id: "532", value: "Kids" },
-          { id: "539", value: "Magic" },
-          { id: "533", value: "Mahou Shoujo" },
-          { id: "534", value: "Martial Arts" },
-          { id: "19", value: "Mecha" },
-          { id: "535", value: "Military" },
-          { id: "21", value: "Music" },
-          { id: "22", value: "Mystery" },
-          { id: "23", value: "Parody" },
-          { id: "536", value: "Psychological" },
-          { id: "25", value: "Reverse Harem" },
-          { id: "26", value: "Romance" },
-          { id: "73", value: "School" },
-          { id: "28", value: "Sci-Fi" },
-          { id: "537", value: "Seinen" },
-          { id: "30", value: "Shoujo" },
-          { id: "31", value: "Shounen" },
-          { id: "538", value: "Slice of Life" },
-          { id: "33", value: "Space" },
-          { id: "34", value: "Sports" },
-          { id: "75", value: "Super Power" },
-          { id: "76", value: "Supernatural" },
-          { id: "37", value: "Suspense" },
-          { id: "38", value: "Thriller" },
-          { id: "39", value: "Vampire" }
-        ],
+        options: searchDetails?.genres?.map((g) => ({
+          id: g.id,
+          value: g.label
+        })) || [],
         allowExclusion: true,
         value: {},
         title: "Genre Filter",
@@ -17548,60 +17725,108 @@ var source = (() => {
         type: "dropdown",
         options: [
           { id: "all", value: "All" },
-          { id: "completed", value: "Completed" },
-          { id: "releasing", value: "Releasing" },
-          { id: "hiatus", value: "On Hiatus" },
-          { id: "discontinued", value: "Discontinued" },
-          { id: "not_published", value: "Not Yet Published" }
+          ...searchDetails?.status?.map((s) => ({
+            id: s.id,
+            value: s.label
+          })) || []
         ],
         value: "all",
         title: "Status Filter"
       });
+      filters2.push({
+        id: "language",
+        type: "dropdown",
+        options: [
+          { id: "all", value: "All" },
+          ...searchDetails?.languages?.map((l) => ({
+            id: l.id,
+            value: l.label
+          })) || []
+        ],
+        value: "all",
+        title: "Language Filter"
+      });
+      filters2.push({
+        id: "year",
+        type: "dropdown",
+        options: [
+          { id: "all", value: "All" },
+          ...searchDetails?.years?.map((y) => ({
+            id: y.id,
+            value: y.label
+          })) || []
+        ],
+        value: "all",
+        title: "Year Filter"
+      });
+      filters2.push({
+        id: "length",
+        type: "dropdown",
+        options: [
+          { id: "all", value: "All" },
+          ...searchDetails?.lengths?.map((l) => ({
+            id: l.id,
+            value: l.label
+          })) || []
+        ],
+        value: "all",
+        title: "Length Filter"
+      });
       return filters2;
     }
-    async getSearchResults(query, metadata) {
+    async getSortingOptions(query) {
+      void query;
+      const searchDetails = await this.getSearchDetails();
+      const sortingOptions = searchDetails?.sorts?.map((sort) => ({
+        id: sort.id,
+        label: sort.label
+      })) || [];
+      return sortingOptions;
+    }
+    async getSearchResults(query, metadata, sortingOption) {
       const page = metadata?.page ?? 1;
       const searchUrl = new URLBuilder(baseUrl).addPath("filter").addQuery("keyword", query.title).addQuery("page", page.toString()).addQuery("genre_mode", "and");
       const getFilterValue = (id) => query.filters.find((filter4) => filter4.id == id)?.value;
       const type = getFilterValue("type");
       const genres = getFilterValue("genres");
       const status = getFilterValue("status");
+      const languages = getFilterValue("language");
+      const year = getFilterValue("year");
+      const length = getFilterValue("length");
       if (type && type != "all") {
         searchUrl.addQuery("type[]", type);
       }
+      let url = searchUrl.build();
       if (genres && typeof genres === "object") {
+        const includedGenres = [];
+        const excludedGenres = [];
         Object.entries(genres).forEach(([id, value]) => {
           if (value === "included") {
-            searchUrl.addQuery("genre[]", id);
+            includedGenres.push(id);
+            url += `&genre[]=${id}`;
           } else if (value === "excluded") {
-            searchUrl.addQuery("genre[]", `-${id}`);
+            const excludedId = `-${id}`;
+            excludedGenres.push(excludedId);
+            url += `&genre[]=${excludedId}`;
           }
         });
       }
-      if (status && status != "all") {
-        let statusValue;
-        switch (status) {
-          case "completed":
-            statusValue = "completed";
-            break;
-          case "releasing":
-            statusValue = "releasing";
-            break;
-          case "hiatus":
-            statusValue = "hiatus";
-            break;
-          case "discontinued":
-            statusValue = "discontinued";
-            break;
-          case "not_published":
-            statusValue = "not_published";
-            break;
-          default:
-            statusValue = "releasing";
-        }
-        searchUrl.addQuery("status[]", statusValue);
+      if (status && status !== "all" && typeof status === "string") {
+        url += `&status[]=${status}`;
       }
-      const request = { url: searchUrl.build(), method: "GET" };
+      if (languages && languages !== "all" && typeof languages === "string") {
+        url += `&language[]=${languages}`;
+      }
+      if (year && year !== "all" && typeof year === "string") {
+        url += `&year[]=${year}`;
+      }
+      if (length && length !== "all" && typeof length === "string") {
+        url += `&length[]=${length}`;
+      }
+      if (sortingOption) {
+        url += `&sort=${sortingOption.id}`;
+      }
+      const request = { url, method: "GET" };
       const $2 = await this.fetchCheerio(request);
       const searchResults = [];
       $2(".original.card-lg .unit .inner").each((_, element) => {
@@ -17639,7 +17864,7 @@ var source = (() => {
       const title = $2(".manga-detail .info h1").text().trim();
       const altTitles = [$2(".manga-detail .info h6").text().trim()];
       const image = $2(".manga-detail .poster img").attr("src") || "";
-      const description = $2(".manga-detail .info .description").text().trim();
+      const description = $2("#synopsis .modal-content").text().trim() || $2(".manga-detail .info .description").text().trim();
       const authors = [];
       $2("#info-rating .meta div").each((_, element) => {
         const label = $2(element).find("span").first().text().trim();
@@ -17650,13 +17875,16 @@ var source = (() => {
         }
       });
       let status = "UNKNOWN";
-      const statusText = $2(".manga-detail .info .min-info").text().toLowerCase();
-      if (statusText.includes("releasing")) {
+      let statusText = "Unknown";
+      $2(".manga-detail .info p").each((_, element) => {
+        statusText = $2(element).text().trim();
+      });
+      if (statusText.includes("Releasing")) {
         status = "ONGOING";
-      } else if (statusText.includes("completed")) {
+      } else if (statusText.includes("Completed")) {
         status = "COMPLETED";
-      } else if (statusText.includes("hiatus") || statusText.includes("discontinued") || statusText.includes("not yet published")) {
-        status = "UNKNOWN";
+      } else if (statusText.includes("hiatus") || statusText.includes("discontinued") || statusText.includes("not yet published") || statusText.includes("completed")) {
+        status = statusText.toLocaleUpperCase().replace(/\s+/g, "_");
       }
       const tags = [];
       const genres = [];
@@ -17691,7 +17919,7 @@ var source = (() => {
           thumbnailUrl: image,
           synopsis: description,
           rating,
-          contentRating: import_types3.ContentRating.EVERYONE,
+          contentRating: import_types4.ContentRating.EVERYONE,
           status,
           tagGroups: tags
         }
@@ -17699,87 +17927,103 @@ var source = (() => {
     }
     async getChapters(sourceManga) {
       const mangaId = sourceManga.mangaId.split(".")[1];
-      const requests = ["read", "manga"].map((type) => ({
-        url: new URLBuilder(baseUrl).addPath("ajax").addPath(type).addPath(mangaId).addPath("chapter").addPath("en").build(),
-        method: "GET"
-      }));
-      let buffer1 = null;
-      let buffer2 = null;
-      try {
-        [buffer1, buffer2] = await Promise.all(
-          requests.map(
-            (req) => Application.scheduleRequest(req).then(
-              ([, buffer]) => buffer
-            )
-          )
-        );
-      } catch (error) {
-        console.error("Failed to fetch chapter buffers:", error);
-        buffer1 = buffer2 = null;
-      }
-      let r1 = null;
-      let r2 = null;
-      let $r2;
-      let $1;
-      if (buffer1) {
-        try {
-          r1 = JSON.parse(
-            Application.arrayBufferToUTF8String(buffer1)
-          );
-          if (r1?.result && typeof r1.result !== "string" && r1.result.html) {
-            $1 = load(r1.result.html);
-          }
-        } catch (error) {
-          console.error("Failed to parse buffer1:", error);
-        }
-      }
-      if (buffer2) {
-        try {
-          r2 = JSON.parse(
-            Application.arrayBufferToUTF8String(buffer2)
-          );
-          const html3 = typeof r2?.result === "string" ? r2.result : r2?.result?.html || "";
-          if (html3) {
-            $r2 = load(html3);
-          }
-        } catch (error) {
-          console.error("Failed to parse buffer2:", error);
-        }
-      }
-      const timestampMap = /* @__PURE__ */ new Map();
-      if ($r2) {
-        $r2("li").each((_, el) => {
-          const li = $r2(el);
-          const chapterNumber = li.attr("data-number") || "0";
-          const dateText = li.find("span").last().text().trim();
-          timestampMap.set(chapterNumber, dateText);
-        });
-      }
-      const chapters = [];
-      if ($1) {
-        $1("li").each((_, el) => {
-          const li = $1(el);
-          const link = li.find("a");
-          const chapterNumber = link.attr("data-number") || "0";
-          const timestamp = timestampMap.get(chapterNumber);
-          chapters.push({
-            chapterId: link.attr("data-id") || "0",
-            title: link.find("span").first().text().trim(),
-            sourceManga,
-            chapNum: parseFloat(String(chapterNumber)),
-            publishDate: timestamp ? new Date(convertToISO8601(timestamp)) : /* @__PURE__ */ new Date(),
-            volume: void 0,
-            langCode: "\u{1F1EC}\u{1F1E7}"
+      const languages = getLanguages();
+      const allRequests = [];
+      for (const lang of languages) {
+        for (const type of ["read", "manga"]) {
+          allRequests.push({
+            url: new URLBuilder(baseUrl).addPath("ajax").addPath(type).addPath(mangaId).addPath("chapter").addPath(lang).build(),
+            method: "GET",
+            language: lang,
+            type
           });
-        });
+        }
+      }
+      const responses = await Promise.allSettled(
+        allRequests.map(
+          (req) => Application.scheduleRequest({
+            url: req.url,
+            method: req.method
+          }).then(([, buffer]) => ({
+            buffer,
+            language: req.language,
+            type: req.type
+          }))
+        )
+      );
+      const chapters = [];
+      const timestampMaps = /* @__PURE__ */ new Map();
+      for (const response of responses) {
+        if (response.status === "fulfilled" && response.value.type === "manga") {
+          try {
+            const buffer = response.value.buffer;
+            const language = response.value.language;
+            const r2 = JSON.parse(
+              Application.arrayBufferToUTF8String(buffer)
+            );
+            const html3 = typeof r2?.result === "string" ? r2.result : r2?.result?.html || "";
+            if (html3) {
+              const $r2 = load(html3);
+              const timestampMap = /* @__PURE__ */ new Map();
+              $r2("li").each((_, el) => {
+                const li = $r2(el);
+                const chapterNumber = li.attr("data-number") || "0";
+                const dateText = li.find("span").last().text().trim();
+                timestampMap.set(chapterNumber, dateText);
+              });
+              if (timestampMap.size > 0) {
+                timestampMaps.set(language, timestampMap);
+              }
+            }
+          } catch (error) {
+            console.error(
+              `Failed to parse buffer for language ${response.value.language}:`,
+              error
+            );
+          }
+        }
+      }
+      for (const response of responses) {
+        if (response.status === "fulfilled" && response.value.type === "read") {
+          try {
+            const buffer = response.value.buffer;
+            const language = response.value.language;
+            const r1 = JSON.parse(
+              Application.arrayBufferToUTF8String(buffer)
+            );
+            if (r1?.result && typeof r1.result !== "string" && r1.result.html) {
+              const $1 = load(r1.result.html);
+              const timestampMap = timestampMaps.get(language);
+              $1("li").each((_, el) => {
+                const li = $1(el);
+                const link = li.find("a");
+                const chapterNumber = link.attr("data-number") || "0";
+                const timestamp = timestampMap?.get(chapterNumber);
+                chapters.push({
+                  chapterId: link.attr("data-id") || "0",
+                  title: link.find("span").first().text().trim(),
+                  sourceManga,
+                  chapNum: parseFloat(String(chapterNumber)),
+                  publishDate: timestamp ? new Date(convertToISO8601(timestamp)) : void 0,
+                  volume: void 0,
+                  langCode: getLanguageFlag(language),
+                  version: getLanguageVersion(language)
+                });
+              });
+            }
+          } catch (error) {
+            console.error(
+              `Failed to parse buffer for language ${response.value.language}:`,
+              error
+            );
+          }
+        }
       }
       return chapters;
     }
     async getChapterDetails(chapter) {
-      console.log(`Parsing chapter ${chapter.chapterId}`);
       try {
         const url = new URLBuilder(baseUrl).addPath("ajax").addPath("read").addPath("chapter").addPath(chapter.chapterId).build();
-        console.log(url);
         const request = { url, method: "GET" };
         const [_, buffer] = await Application.scheduleRequest(request);
         const json = JSON.parse(
@@ -17914,6 +18158,27 @@ var source = (() => {
         metadata: hasNextPage ? { page: page + 1, collectedIds } : void 0
       };
     }
+    async getTypesSection() {
+      const searchDetails = await this.getSearchDetails();
+      const types = searchDetails?.types || [];
+      return {
+        items: types.map((type) => ({
+          type: "genresCarouselItem",
+          searchQuery: {
+            title: "",
+            filters: [
+              {
+                id: type.id,
+                value: type.label
+              }
+            ]
+          },
+          name: type.label,
+          metadata: void 0
+        })),
+        metadata: void 0
+      };
+    }
     async getFilterSection() {
       const items = [
         { id: "manhua", name: "Manhua", type: "type" },
@@ -17979,9 +18244,30 @@ var source = (() => {
         metadata: void 0
       };
     }
+    async getLanguagesSection() {
+      const searchDetails = await this.getSearchDetails();
+      const languages = searchDetails?.languages || [];
+      return {
+        items: languages.map((lang) => ({
+          type: "genresCarouselItem",
+          searchQuery: {
+            title: "",
+            filters: [
+              {
+                id: lang.id,
+                value: lang.label
+              }
+            ]
+          },
+          name: `${getLanguageFlag(lang.id)} ${lang.label}`,
+          metadata: void 0
+        })),
+        metadata: void 0
+      };
+    }
     checkCloudflareStatus(status) {
       if (status == 503 || status == 403) {
-        throw new import_types3.CloudflareError({ url: baseUrl, method: "GET" });
+        throw new import_types4.CloudflareError({ url: baseUrl, method: "GET" });
       }
     }
     async fetchCheerio(request) {
@@ -18032,6 +18318,46 @@ var source = (() => {
     }
     const parsedDate = new Date(dateText);
     return isNaN(parsedDate.getTime()) ? now.toISOString() : parsedDate.toISOString();
+  }
+  function getLanguageFlag(language) {
+    switch (language) {
+      case "en":
+        return "\u{1F1EC}\u{1F1E7}";
+      case "fr":
+        return "\u{1F1EB}\u{1F1F7}";
+      case "es":
+        return "\u{1F1EA}\u{1F1F8}";
+      case "es-la":
+        return "\u{1F1F2}\u{1F1FD}";
+      case "pt":
+        return "\u{1F1F5}\u{1F1F9}";
+      case "pt-br":
+        return "\u{1F1E7}\u{1F1F7}";
+      case "ja":
+        return "\u{1F1EF}\u{1F1F5}";
+      default:
+        return "\u{1F1EC}\u{1F1E7}";
+    }
+  }
+  function getLanguageVersion(language) {
+    switch (language) {
+      case "en":
+        return "EN";
+      case "fr":
+        return "FR";
+      case "es":
+        return "ES";
+      case "es-la":
+        return "ESLA";
+      case "pt":
+        return "PT";
+      case "pt-br":
+        return "PTBR";
+      case "ja":
+        return "JP";
+      default:
+        return "EN";
+    }
   }
   var MangaFire = new MangaFireExtension();
   return __toCommonJS(main_exports);
